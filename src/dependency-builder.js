@@ -4,6 +4,8 @@ function DependencyBuilder(config) {
     this._config = config;
 
     this._init();
+
+    this._conditionalModules = {};
 }
 
 DependencyBuilder.prototype = {
@@ -21,6 +23,8 @@ DependencyBuilder.prototype = {
         if (!isDepsAray) {
             dependencies = arguments;
         }
+
+        this._processConditionalModules(dependencies);
 
         for (i = 0; i < dependencies.length; i++) {
             module = this._config.modules[dependencies[i]];
@@ -68,7 +72,24 @@ DependencyBuilder.prototype = {
                 module = this._config.modules[key];
 
                 module.name = key;
+
+                this._initConditionalModule(module);
             }
+        }
+    },
+
+    _initConditionalModule: function(module) {
+        if (module.condition && module.condition.test.call()) {
+            this._conditionalModules[module.condition.trigger] = module;
+        }
+    },
+
+    _processConditionalModules: function(dependencies) {
+        var i,
+            module;
+
+        for (i = 0; i < dependencies.length; i++) {
+            module = this._config.modules[dependencies[i]];
         }
     },
 
