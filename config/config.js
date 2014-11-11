@@ -16,7 +16,7 @@ var config = {
 
         'aui-test2': {
             condition: {
-                trigger: 'aui-dialog',
+                trigger: 'aui-plugin-base',
                 test: function() {
                     return true;
                 }
@@ -63,6 +63,11 @@ var config = {
         'aui-event': {
             deps: ['aui-node', 'aui-plugin-base'],
             path: '/html/js/aui-event.js'
+        },
+
+        'aui-nate': {
+            deps: ['aui-autocomplete', 'aui-event'],
+            path: '/html/js/aui-nate.js'
         }
     }
 };

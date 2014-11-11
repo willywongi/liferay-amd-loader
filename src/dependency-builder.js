@@ -3,31 +3,27 @@
 function DependencyBuilder(config) {
     this._config = config;
 
-    this._init();
-
-    this._conditionalModules = {};
+    this._init(config);
 }
 
 DependencyBuilder.prototype = {
     constructor: DependencyBuilder,
 
-    resolve: function(dependencies) {
+    resolve: function(modules) {
         var i,
             isDepsAray,
             module,
             result;
 
-        isDepsAray = Array.isArray ? Array.isArray(dependencies) :
-            Object.prototype.toString.call(dependencies) === '[object Array]';
+        isDepsAray = Array.isArray ? Array.isArray(modules) :
+            Object.prototype.toString.call(modules) === '[object Array]';
 
         if (!isDepsAray) {
-            dependencies = arguments;
+            modules = arguments;
         }
 
-        this._processConditionalModules(dependencies);
-
-        for (i = 0; i < dependencies.length; i++) {
-            module = this._config.modules[dependencies[i]];
+        for (i = 0; i < modules.length; i++) {
+            module = this._config.modules[modules[i]];
 
             if (!module.mark) {
                 this._visit(module);
@@ -60,10 +56,12 @@ DependencyBuilder.prototype = {
         this._result.length = 0;
     },
 
-    _init: function() {
+    _init: function(config) {
         var hasOwnProperty,
             key = 0,
             module;
+
+        this._conditionalModules = {};
 
         hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -79,17 +77,16 @@ DependencyBuilder.prototype = {
     },
 
     _initConditionalModule: function(module) {
-        if (module.condition && module.condition.test.call()) {
-            this._conditionalModules[module.condition.trigger] = module;
-        }
-    },
+        var existingModules;
 
-    _processConditionalModules: function(dependencies) {
-        var i,
-            module;
+        if (module.condition) {
+            existingModules = this._conditionalModules[module.condition.trigger];
 
-        for (i = 0; i < dependencies.length; i++) {
-            module = this._config.modules[dependencies[i]];
+            if (!existingModules) {
+                this._conditionalModules[module.condition.trigger] = existingModules = [];
+            }
+
+            existingModules.push(module.name);
         }
     },
 

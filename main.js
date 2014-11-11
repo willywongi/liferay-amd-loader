@@ -1,5 +1,7 @@
 'use strict';
 
+debugger;
+
 var config = require('./config/config.js');
 
 var DependencyBuilder = require('./src/dependency-builder.js');
@@ -9,19 +11,27 @@ var depBuilder = new DependencyBuilder(config);
 
 var urlBuilder = new URLBuilder(config);
 
-var res = depBuilder.resolve('aui-dialog');
-console.log('Dependencies', res.join());
+// var res = depBuilder.resolve('aui-dialog');
+// console.log('Dependencies', res.join());
 
-res = urlBuilder.build(res);
-console.log('URL', res);
+// res = urlBuilder.build(res);
+// console.log('URL', res);
 
-res = depBuilder.resolve('aui-autocomplete');
-console.log('Dependencies', res.join());
+// res = depBuilder.resolve('aui-autocomplete');
+// console.log('Dependencies', res.join());
 
-res = urlBuilder.build(res);
-console.log('URL', res);
+// res = urlBuilder.build(res);
+// console.log('URL', res);
 
-res = depBuilder.resolve(['aui-node', 'aui-plugin-base']);
+// res = depBuilder.resolve(['aui-node', 'aui-plugin-base']);
+// console.log('Dependencies', res.join());
+
+// res = urlBuilder.build(res);
+// console.log('URL', res);
+
+debugger;
+
+var res = depBuilder.resolve(['aui-nate']);
 console.log('Dependencies', res.join());
 
 res = urlBuilder.build(res);
