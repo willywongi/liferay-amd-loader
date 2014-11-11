@@ -45,6 +45,17 @@ var config = {
             path: '/html/js/aui-node.js'
         },
 
+        'aui-chema': {
+            condition: {
+                trigger: 'aui-nate',
+                test: function() {
+                    return true;
+                }
+            },
+            deps: ['aui-autocomplete', 'aui-event', 'aui-node'],
+            path: '/html/js/aui-chema.js'
+        },
+
         'aui-dialog': {
             deps: ['aui-node', 'aui-plugin-base'],
             path: '/html/js/aui-dialog.js'
