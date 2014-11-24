@@ -42,7 +42,7 @@ URLBuilder.prototype = {
                 if (module.fullPath) {
                     result.push(module.fullPath);
 
-                } else if (!group.combine) {
+                } else if (!group.combine || !defaultGroup.combine) {
                     result.push((group.url || defaultGroup.url) + groupPath + module.path);
 
                 } else {

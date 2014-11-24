@@ -1,8 +1,9 @@
 'use strict';
 
+var escodegen = require('escodegen');
 var esprima = require('esprima');
-var eswalk = require('eswalk');
 var fs = require('fs');
+var jsstana = require('jsstana');
 var path = require('path');
 var program = require('commander');
 var Promise = require('bluebird');
@@ -10,7 +11,6 @@ var walk = require('walk');
 
 
 Promise.promisifyAll(fs);
-Promise.promisifyAll(eswalk);
 
 function list(value) {
     return value.split(',').map(String);
@@ -23,10 +23,30 @@ program
     .version('0.0.1')
     .parse(process.argv);
 
-
 var options = {
     followLinks: false
 };
+
+function getConfig(file, ast) {
+    return new Promise(function(resolve, reject) {
+        var result = [];
+
+        jsstana.traverse(ast, function (node) {
+            var match = jsstana.match('(call Loader.register ? ? ? ??)', node);
+
+            if (match) {
+                result.push({
+                    file: file,
+                    module: escodegen.generate(node.arguments[0]),
+                    dependencies: escodegen.generate(node.arguments[1]),
+                    condition: node.arguments[3] ? escodegen.generate(node.arguments[3]) : null
+                });
+            }
+        });
+
+        resolve(result);
+    });
+}
 
 function parseFile(file, content) {
     return new Promise(function(resolve, reject) {
@@ -36,25 +56,7 @@ function parseFile(file, content) {
     });
 }
 
-function getConfig(file, ast) {
-    return new Promise(function(resolve, reject) {
-        eswalk(ast, function(node, parent) {
-            if (node.type == 'ExpressionStatement' &&
-                node.expression.type == 'CallExpression' &&
-                node.expression.callee.object &&
-                node.expression.callee.object.type == 'type' &&
-                node.expression.callee.object.name == 'Loader' &&
-                node.expression.callee.property &&
-                node.expression.callee.property.type == 'Identifier' &&
-                node.expression.callee.property.name == 'register') {
-
-                debugger;
-            }
-        });
-
-        resolve();
-    });
-}
+var modules = [];
 
 for (var i = 0; i < program.file.length; i++) {
     var walker = walk.walk(program.file[i], options);
@@ -72,7 +74,9 @@ for (var i = 0; i < program.file.length; i++) {
                 .then(function(ast) {
                     return getConfig(file, ast);
                 })
-                .then(function() {
+                .then(function(config) {
+                    modules = modules.concat(config);
+
                     next();
                 });
         }
@@ -80,5 +84,9 @@ for (var i = 0; i < program.file.length; i++) {
             next();
         }
 
+    });
+
+    walker.on('end', function() {
+        console.log(modules);
     });
 }

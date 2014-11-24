@@ -202,14 +202,14 @@ AUI.Utils.extend(Loader, EventEmitter, {
 
                     script.onload = script.onreadystatechange = null;
 
-                    resolve();
+                    resolve(script);
                 }
             };
 
             script.onerror = function() {
                 document.body.removeChild(script);
 
-                reject();
+                reject(script);
             };
 
             document.body.appendChild(script);
