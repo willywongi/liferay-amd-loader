@@ -38,7 +38,7 @@ function extractObjectValues(idents, ast) {
             if (found) {
                 found = false;
 
-                result[ident] = node.type === 'Literal' ? node.value : escodegen.generate(node);
+                result[ident] = extractValue(node);
             }
 
             for (var i = 0; i < idents.length; i++) {
@@ -56,6 +56,78 @@ function extractObjectValues(idents, ast) {
     return result;
 }
 
+function extractValue(node) {
+    var i;
+    var property;
+
+    debugger;
+
+    if (node.type === 'Literal') {
+        return node.value;
+    } else if (node.type === 'ObjectExpression') {
+        var obj = {};
+
+        for (i = 0; i < node.properties.length; i++) {
+            property = node.properties[i];
+
+            obj[property.key.name] = extractValue(property.value);
+        }
+
+        return obj;
+    } else if (node.type === 'ArrayExpression') {
+
+    } else if (node.type === 'FunctionExpression') {
+        debugger;
+        return eval(escodegen.generate(node));
+    }
+}
+
+function generateConfig(config) {
+    return new Promise(function(resolve, reject) {
+        for (var i = 0; i < modules.length; i++) {
+            var module = modules[i];
+
+            var moduleGroup = module.group;
+
+            var groupModules;
+
+            debugger;
+
+            if (moduleGroup) {
+                if (!config[moduleGroup]) {
+                    config[moduleGroup] = {modules: {}};
+                }
+
+                groupModules = config[moduleGroup].modules;
+            }
+            else {
+                if (!config.modules) {
+                    config.modules = {};
+                }
+
+                groupModules = config.modules;
+            }
+
+            var storedModule = groupModules[module.name] = {
+                dependencies: module.dependencies
+            };
+
+            if (module.condition) {
+                storedModule.condition = module.condition;
+            }
+
+            if (module.fullPath) {
+                storedModule.fullPath = module.fullPath;
+            }
+            else {
+                storedModule.path = module.path || module.file;
+            }
+        }
+
+        resolve(config);
+    });
+}
+
 function getConfig(file, ast) {
     return new Promise(function(resolve, reject) {
         var result = [];
@@ -66,7 +138,7 @@ function getConfig(file, ast) {
             if (match) {
                 var config = {
                     file: path.basename(file),
-                    module: escodegen.generate(node.arguments[0]),
+                    name: node.arguments[0].value,
                     dependencies: escodegen.generate(node.arguments[1])
                 };
 
@@ -131,19 +203,28 @@ function onWalkerEnd(walker){
     });
 }
 
-function saveConfig() {
+function saveConfig(config) {
     return new Promise(function(resolve, reject) {
-        debugger;
-        resolve(modules);
+        if (program.output) {
+            fs.writeFileAsync(program.output, JSON.stringify(config))
+                .then(function() {
+                    debugger;
+                    resolve(config);
+                });
+        } else {
+            console.log(config);
+        }
+
     });
 }
 
-var processors = [];
-var modules = [];
+var configBase = {};
 var i;
+var modules = [];
+var processors = [];
 
 if (program.config) {
-    var configBase = require(path.resolve(program.config));
+    configBase = require(path.resolve(program.config));
 }
 
 // For every file or folder, create a promise,
@@ -168,7 +249,11 @@ for (i = 0; i < program.args.length; i++) {
 
 Promise.all(processors)
     .then(function(uselessPromises) {
-        return saveConfig();
+        return generateConfig(configBase || {});
+    })
+    .then(function(config) {
+        debugger;
+        return saveConfig(config);
     })
     .then(function(config) {
         console.log(config);
