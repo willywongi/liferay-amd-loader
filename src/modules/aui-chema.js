@@ -1,3 +1,6 @@
+var test123 = 0;
+
+
 Loader.register('aui-chema', ['aui-autocomplete', 'aui-event', 'aui-node'], function(autocomplete, event_, node) {
     AUI.Utils.assertValue(autocomplete);
     AUI.Utils.assertValue(event_);

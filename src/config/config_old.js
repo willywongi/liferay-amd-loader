@@ -17,7 +17,7 @@ var __CONFIG__ = {
 
                 'aui-chema-group-test2': {
                     dependencies: ['aui-plugin-base'],
-                    path: 'aui-chema-group-test2.js'
+                    path: 'ambrinui-chema-group-test2.js'
                 }
             }
         },
@@ -119,33 +119,3 @@ var __CONFIG__ = {
         }
     }
 };
-
-
-if (typeof module === 'object' && module) {
-    module.exports = config;
-}
-
-
-
-// base
-
-// 1. path
-
-// 2. fullPath
-
-// if (module has full path) {
-//     unconditionally create individual request for it
-// }
-
-
-// if (combo is true) {
-//     assume base is combo url and create combo url:
-//     'http://localhost:8080/combo?aui-nate.js&/html/js/aui-event.js',
-// }
-
-// if (combo is false) {
-//     make invididual requests for each file by combining base + module path
-
-//     'http://localhost:8080/base/html/js/aui-nate.js',
-//     'http://localhost:8080/base/html/js/aui-event.js'
-// }
