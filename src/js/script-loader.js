@@ -21,7 +21,14 @@ AUI.Utils.extend(Loader, EventEmitter, {
             Object.prototype.toString.call(args) === '[object Array]';
 
         if (!isArgsArray) {
-            modules = Array.prototype.slice.call(arguments, 0);
+            // The code below will work too,
+            // but arguments must be not leaked for V8 peformance:
+            // modules = Array.prototype.slice.call(arguments, 0);
+            modules = new Array(arguments.length);
+
+            for (var i = 0; i < arguments.length; ++i) {
+                modules[i] = arguments[i];
+            }
         }
 
         return new Promise(function(resolve, reject) {
