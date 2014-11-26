@@ -31,13 +31,9 @@ DependencyBuilder.prototype = {
         // Set to false all temporary markers which were set during the process of
         // dependencies resolving.
         Object.forEach(modules, function(key, module) {
-            if (hasOwnProperty.call(modules, key)) {
-                var module = modules[key];
-
-                module.conditionalMark = false;
-                module.mark = false;
-                module.tmpMark = false;
-            }
+            module.conditionalMark = false;
+            module.mark = false;
+            module.tmpMark = false;
         }, this);
 
         this._queue.length = 0;
