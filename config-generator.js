@@ -60,8 +60,6 @@ function extractValue(node) {
     var i;
     var property;
 
-    debugger;
-
     if (node.type === 'Literal') {
         return node.value;
     } else if (node.type === 'ObjectExpression') {
@@ -75,10 +73,16 @@ function extractValue(node) {
 
         return obj;
     } else if (node.type === 'ArrayExpression') {
+        var arr = [];
+
+        for (i = 0; i < node.elements.length; i++) {
+            arr.push(extractValue(node.elements[i]));
+        }
+
+        return arr;
 
     } else if (node.type === 'FunctionExpression') {
-        debugger;
-        return eval(escodegen.generate(node));
+        return eval('false || ' + escodegen.generate(node));
     }
 }
 
@@ -90,8 +94,6 @@ function generateConfig(config) {
             var moduleGroup = module.group;
 
             var groupModules;
-
-            debugger;
 
             if (moduleGroup) {
                 if (!config[moduleGroup]) {
@@ -139,7 +141,7 @@ function getConfig(file, ast) {
                 var config = {
                     file: path.basename(file),
                     name: node.arguments[0].value,
-                    dependencies: escodegen.generate(node.arguments[1])
+                    dependencies: extractValue(node.arguments[1])
                 };
 
                 var values = extractObjectValues(['path', 'fullPath', 'condition', 'group'], node.arguments[3]);
