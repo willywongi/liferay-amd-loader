@@ -19,7 +19,9 @@ Loader.register('aui-chema', ['aui-autocomplete', 'aui-event', 'aui-node'], func
 	condition: {
         trigger: 'aui-nate',
         test: function() {
-            return true;
+            var el = document.createElement('input');
+
+            return ('placeholder' in el);
         }
     },
     path: 'aui-chema.js'

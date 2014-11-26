@@ -44,8 +44,7 @@ DependencyBuilder.prototype = {
         var conditionalModules = this._configParser.getConditionalModules()[module.name];
 
         // If the current module has conditional modules as dependencies,
-
-// add them to the list (queue) of modules, which have to be resolveDependenciesd.
+        // add them to the list (queue) of modules, which have to be resolved.
         if (conditionalModules && !module.conditionalMark) {
             var modules = this._configParser.getModules();
 
@@ -53,7 +52,7 @@ DependencyBuilder.prototype = {
                 var conditionalModule = modules[conditionalModules[i]];
 
                 if (this._queue.indexOf(conditionalModule.name) === -1 &&
-                    conditionalModule.condition.test.call(conditionalModule)) {
+                    this._testConditionalModule(conditionalModule.condition.test)) {
 
                     this._queue.push(conditionalModule.name);
                 }
@@ -74,6 +73,15 @@ DependencyBuilder.prototype = {
             if (!module.mark) {
                 this._visit(module);
             }
+        }
+    },
+
+    _testConditionalModule: function(testFunction) {
+        if (typeof testFunction === 'function') {
+            return testFunction();
+        } else {
+            debugger;
+            return eval('false || ' + testFunction)();
         }
     },
 

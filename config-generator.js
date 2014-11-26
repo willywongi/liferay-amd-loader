@@ -18,6 +18,7 @@ function list(value) {
 
 program
     .usage('[options] <file ...>', list)
+    .option('-var, --variable [config variable]', 'The variable to which configuration will be assigned.', String, '__CONFIG__')
     .option('-o, --output [file name]', 'Output file to store the generated configuration.')
     .option('-c, --config [file name]', 'Already existing template config to be joined with the parsed configuration.')
     .version('0.0.1')
@@ -82,7 +83,7 @@ function extractValue(node) {
         return arr;
 
     } else if (node.type === 'FunctionExpression') {
-        return eval('false || ' + escodegen.generate(node));
+        return escodegen.generate(node);
     }
 }
 
@@ -96,11 +97,19 @@ function generateConfig(config) {
             var groupModules;
 
             if (moduleGroup) {
-                if (!config[moduleGroup]) {
+                if (!config.groups) {
+                    config.groups = {};
+                }
+
+                if (!config.groups[moduleGroup]) {
                     config[moduleGroup] = {modules: {}};
                 }
 
-                groupModules = config[moduleGroup].modules;
+                groupModules = config.groups[moduleGroup].modules;
+
+                if (!groupModules) {
+                    groupModules = config.groups[moduleGroup].modules = {};
+                }
             }
             else {
                 if (!config.modules) {
@@ -111,8 +120,8 @@ function generateConfig(config) {
             }
 
             var storedModule = groupModules[module.name] = {
-                dependencies: module.dependencies
-            };
+                    dependencies: module.dependencies
+                };
 
             if (module.condition) {
                 storedModule.condition = module.condition;
@@ -208,15 +217,13 @@ function onWalkerEnd(walker){
 function saveConfig(config) {
     return new Promise(function(resolve, reject) {
         if (program.output) {
-            fs.writeFileAsync(program.output, JSON.stringify(config))
+            fs.writeFileAsync(program.output, config)
                 .then(function() {
-                    debugger;
                     resolve(config);
                 });
         } else {
             console.log(config);
         }
-
     });
 }
 
@@ -254,13 +261,9 @@ Promise.all(processors)
         return generateConfig(configBase || {});
     })
     .then(function(config) {
-        debugger;
-        return saveConfig(config);
-    })
-    .then(function(config) {
-        console.log(config);
+        var content = 'var ' + program.variable + ' = ' + JSON.stringify(config, null, 4) + ';';
 
-        console.log('Done!');
+        return saveConfig(content);
     })
     .catch(function(error) {
         console.error(error);
