@@ -1,9 +1,5 @@
 <%= vendor %>
 
-if (typeof AUI === 'undefined') {
-    var AUI = {};
-}
-
 (function (global, factory) {
     var built = factory();
 
@@ -17,6 +13,7 @@ if (typeof AUI === 'undefined') {
         define(factory);
     }
 
+    global.AUI = global.AUI || {};
     global.Loader = new built();
     global.require = Loader.require.bind(Loader);
     global.define = Loader.register.bind(Loader);
