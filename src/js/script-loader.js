@@ -162,7 +162,7 @@
 
         _getConfigParser: function () {
             if (!this._configParser) {
-                this._configParser = new ConfigParser(this._config || __CONFIG__);
+                this._configParser = new global.Loader.ConfigParser(this._config || __CONFIG__);
             }
 
             return this._configParser;
@@ -170,7 +170,7 @@
 
         _getDependencyBuilder: function () {
             if (!this._dependencyBuilder) {
-                this._dependencyBuilder = new DependencyBuilder(configParser);
+                this._dependencyBuilder = new global.Loader.DependencyBuilder(this._getConfigParser());
             }
 
             return this._dependencyBuilder;
@@ -178,7 +178,7 @@
 
         _getURLBuilder: function () {
             if (!this._urlBuilder) {
-                this._urlBuilder = new URLBuilder(configParser);
+                this._urlBuilder = new global.Loader.URLBuilder(this._getConfigParser());
             }
 
             return this._urlBuilder;
