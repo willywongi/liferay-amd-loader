@@ -11,7 +11,9 @@
         define(factory);
     }
 
-    global.Loader = new built();
+    if (global.Loader) {
+        global.Loader.URLBuilder = built;
+    }
 }(typeof global !== 'undefined' ? global : /* istanbul ignore next */ this, function () {
     'use strict';
 
