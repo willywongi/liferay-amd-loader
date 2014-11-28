@@ -274,7 +274,7 @@
                     var finalModules = [];
 
                     // Ignore wrongly specified (misspelled) modules
-                    for (var i = 0 ; i < modules.length; i++) {
+                    for (var i = 0; i < modules.length; i++) {
                         if (registeredModules[modules[i]]) {
                             finalModules.push(modules[i]);
                         }
