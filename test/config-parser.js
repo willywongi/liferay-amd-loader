@@ -28,32 +28,6 @@ describe('ConfigParser', function() {
     assert.ok(configParser);
 
     var groups = configParser.getGroups();
-
-    assert.ok(groups.chema);
-    assert.ok(groups.ambrin);
-    assert.ok(groups['default']);
-
-
-  });
-
-  it('should create modules from existing data', function() {
-    var configParser = new global.LoaderUtils.ConfigParser(config);
-
-    var modules = configParser.getModules();
-
-    assert.ok(groups.chema);
-    assert.ok(groups.ambrin);
-    assert.ok(groups['default']);
-
-
-  });
-
-  it('should create conditional modules from existing data', function() {
-    var configParser = new global.LoaderUtils.ConfigParser(config);
-
-    assert.ok(configParser);
-
-    var groups = configParser.getGroups();
     var modules = configParser.getModules();
     var conditionalModules = configParser.getConditionalModules();
 
