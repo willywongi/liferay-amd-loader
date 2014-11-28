@@ -34,10 +34,10 @@ gulp.task('combine-js', function() {
     return gulp.src([
         'src/js/utils.js',
         'src/js/event-emitter.js',
-        'src/js/script-loader.js',
         'src/js/config-parser.js',
         'src/js/dependency-builder.js',
         'src/js/url-builder.js',
+        'src/js/script-loader.js',
         ])
     .pipe(concat('source.js'))
     .pipe(gulp.dest('dist/js'));

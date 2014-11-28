@@ -1,4 +1,6 @@
 (function (global, factory) {
+    'use strict';
+
     var built = factory();
 
     /* istanbul ignore else */
@@ -11,6 +13,7 @@
         define(factory);
     }
 
+    /* jshint newcap:false */
     global.Loader = new built();
     global.require = global.Loader.require.bind(global.Loader);
     global.define = global.Loader.register.bind(global.Loader);

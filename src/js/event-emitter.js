@@ -1,4 +1,6 @@
 (function (global, factory) {
+    'use strict';
+
     var built = factory();
 
     /* istanbul ignore else */
