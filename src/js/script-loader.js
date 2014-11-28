@@ -164,7 +164,7 @@
 
         _getConfigParser: function () {
             if (!this._configParser) {
-                this._configParser = new ConfigParser(this._config || __CONFIG__);
+                this._configParser = new LoaderUtils.ConfigParser(this._config || __CONFIG__);
             }
 
             return this._configParser;
@@ -172,7 +172,7 @@
 
         _getDependencyBuilder: function () {
             if (!this._dependencyBuilder) {
-                this._dependencyBuilder = new DependencyBuilder(configParser);
+                this._dependencyBuilder = new LoaderUtils.DependencyBuilder(configParser);
             }
 
             return this._dependencyBuilder;
@@ -180,7 +180,7 @@
 
         _getURLBuilder: function () {
             if (!this._urlBuilder) {
-                this._urlBuilder = new URLBuilder(configParser);
+                this._urlBuilder = new LoaderUtils.URLBuilder(configParser);
             }
 
             return this._urlBuilder;
