@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ipeychev/loader",
   "devDependencies": {
+    "assert": "^1.1.2",
     "bluebird": "^2.3.11",
     "combohandler": "^0.4.0",
     "commander": "^2.5.0",
@@ -37,6 +38,7 @@
     "jshint-stylish": "^1.0.0",
     "jsstana": "^0.1.4",
     "merge-stream": "^0.1.6",
+    "mocha": "^2.0.1",
     "run-sequence": "^1.0.1",
     "walk": "^2.3.4",
     "ypromise": "^0.2.3"

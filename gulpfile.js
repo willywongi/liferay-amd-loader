@@ -114,7 +114,7 @@ gulp.task('test-coverage', ['test-cover'], function() {
 });
 
 gulp.task('test-watch', function() {
-    gulp.watch('src/js/**/*.js', ['test']);
+    gulp.watch('tests/js/**/*.js', ['test']);
 });
 
 gulp.task('source-min', ['js'], function() {
