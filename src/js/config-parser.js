@@ -11,9 +11,7 @@
         define(factory);
     }
 
-    if (global.Loader) {
-        global.Loader.ConfigParser = built;
-    }
+    global.LoaderUtils.ConfigParser = built;
 }(typeof global !== 'undefined' ? global : /* istanbul ignore next */ this, function () {
     'use strict';
 
