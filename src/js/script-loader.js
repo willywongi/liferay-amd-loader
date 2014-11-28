@@ -172,7 +172,7 @@
 
         _getDependencyBuilder: function () {
             if (!this._dependencyBuilder) {
-                this._dependencyBuilder = new LoaderUtils.DependencyBuilder(configParser);
+                this._dependencyBuilder = new LoaderUtils.DependencyBuilder(this._getConfigParser());
             }
 
             return this._dependencyBuilder;
@@ -180,7 +180,7 @@
 
         _getURLBuilder: function () {
             if (!this._urlBuilder) {
-                this._urlBuilder = new LoaderUtils.URLBuilder(configParser);
+                this._urlBuilder = new LoaderUtils.URLBuilder(this._getConfigParser());
             }
 
             return this._urlBuilder;
