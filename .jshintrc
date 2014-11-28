@@ -12,7 +12,7 @@
   "globals": {},
   "globalstrict": true,
   "node": true,
-  "predef": [ "define", "global" ],
+  "predef": [ "define", "global", "LoaderUtils", "__CONFIG__" ],
   "quotmark": true,
   "undef": true,
   "unused": true

@@ -12,6 +12,8 @@
     }
 
     global.Loader = new built();
+    global.require = global.Loader.require.bind(global.Loader);
+    global.define = global.Loader.register.bind(global.Loader);
 }(typeof global !== 'undefined' ? global : /* istanbul ignore next */ this, function () {
     'use strict';
 
@@ -21,7 +23,7 @@
         this._config = config;
     }
 
-    LoaderUtils.extend(Loader, EventEmitter, {
+    LoaderUtils.extend(Loader, LoaderUtils.EventEmitter, {
         import: function (args) {
             var self = this;
 
@@ -132,16 +134,16 @@
                 var moduleImplementations = self._addModuleImplementations(modules);
 
                 if (successCallback) {
-                    successCallback.apply(window, moduleImplementations);
+                    successCallback.apply(successCallback, moduleImplementations);
                 }
             }, function (error) {
                 if (failureCallback) {
-                    failureCallback.call(window, error);
+                    failureCallback.call(failureCallback, error);
 
                 } else if (successCallback) {
                     var moduleImplementations = self._addModuleImplementations(modules);
 
-                    successCallback.apply(window, moduleImplementations);
+                    successCallback.apply(successCallback, moduleImplementations);
                 }
             });
         },
@@ -162,7 +164,7 @@
 
         _getConfigParser: function () {
             if (!this._configParser) {
-                this._configParser = new ConfigParser(this._config || __CONFIG__);
+                this._configParser = new LoaderUtils.ConfigParser(this._config || __CONFIG__);
             }
 
             return this._configParser;
@@ -170,7 +172,7 @@
 
         _getDependencyBuilder: function () {
             if (!this._dependencyBuilder) {
-                this._dependencyBuilder = new DependencyBuilder(configParser);
+                this._dependencyBuilder = new LoaderUtils.DependencyBuilder(this._getConfigParser());
             }
 
             return this._dependencyBuilder;
@@ -178,7 +180,7 @@
 
         _getURLBuilder: function () {
             if (!this._urlBuilder) {
-                this._urlBuilder = new URLBuilder(configParser);
+                this._urlBuilder = new LoaderUtils.URLBuilder(this._getConfigParser());
             }
 
             return this._urlBuilder;
@@ -207,7 +209,7 @@
                 var missingModules = self._filterMissingModules(modules);
 
                 if (missingModules.length) {
-                    var urls = self._getUrlBuilder().build(missingModules);
+                    var urls = self._getURLBuilder().build(missingModules);
 
                     var pendingScripts = [];
 
@@ -268,7 +270,17 @@
 
             return new Promise(function (resolve, reject) {
                 try {
-                    var dependencies = self._getDependencyBuilder().resolveDependencies(modules);
+                    var registeredModules = self._getConfigParser().getModules();
+                    var finalModules = [];
+
+                    // Ignore wrongly specified (misspelled) modules
+                    for (var i = 0 ; i < modules.length; i++) {
+                        if (registeredModules[modules[i]]) {
+                            finalModules.push(modules[i]);
+                        }
+                    }
+
+                    var dependencies = self._getDependencyBuilder().resolveDependencies(finalModules);
 
                     resolve(dependencies);
                 } catch (error) {

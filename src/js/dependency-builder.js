@@ -11,9 +11,7 @@
         define(factory);
     }
 
-    if (global.Loader) {
-        global.Loader.DependencyBuilder = built;
-    }
+    global.LoaderUtils.DependencyBuilder = built;
 }(typeof global !== 'undefined' ? global : /* istanbul ignore next */ this, function () {
     'use strict';
 

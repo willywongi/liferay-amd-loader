@@ -17,7 +17,7 @@ var template = require('gulp-template');
 var uglify = require('gulp-uglify');
 
 gulp.task('build', function(callback) {
-    runSequence('clean', ['config', 'loader-min', 'source-min', 'modules', 'build-config', 'vendor', 'format', 'lint', 'demo'], callback);
+    runSequence('clean', ['config', 'loader-min', 'source-min', 'modules', 'build-config', 'vendor', 'lint', 'demo'], callback);
 });
 
 gulp.task('build-config', function(callback) {
@@ -34,10 +34,10 @@ gulp.task('combine-js', function() {
     return gulp.src([
         'src/js/utils.js',
         'src/js/event-emitter.js',
+        'src/js/script-loader.js',
         'src/js/config-parser.js',
         'src/js/dependency-builder.js',
         'src/js/url-builder.js',
-        'src/js/script-loader.js',
         ])
     .pipe(concat('source.js'))
     .pipe(gulp.dest('dist/js'));
