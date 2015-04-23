@@ -1,7 +1,6 @@
 'use strict';
 
 var beautify = require('js-beautify').js_beautify;
-var escodegen = require('escodegen');
 var esprima = require('esprima-fb');
 var fs = require('fs');
 var jsstana = require('jsstana');
@@ -9,8 +8,11 @@ var path = require('path');
 var pkg = require('./package.json');
 var program = require('commander');
 var Promise = require('bluebird');
+var recast = require('recast');
 var updateNotifier = require('update-notifier');
 var walk = require('walk');
+
+var builders = recast.types.builders;
 
 updateNotifier({
     packageName: pkg.name,
@@ -19,15 +21,20 @@ updateNotifier({
 
 Promise.promisifyAll(fs);
 
-function list(value) {
+function parseList(value) {
     return value.split(',').map(String);
 }
 
 program
-    .usage('[options] <file ...>', list)
-    .option('-c, --config [config object]', 'The configuration object in which the modules should be added.', String, '__CONFIG__')
-    .option('-o, --output [file name]', 'Output file to store the generated configuration.')
-    .option('-b, --base [file name]', 'Already existing template base to be joined with the parsed configuration.')
+    .usage('[options] <file ...>', parseList)
+    .option('-b, --base [file name]', 'Already existing template to be used as base for the parsed configuration')
+    .option('-c, --config [config object]', 'The configuration object in which the modules should be added', String, '__CONFIG__')
+    .option('-e, --extension [module extension]', 'Use the provided string as an extension instead to get it automatically from the file name. Default: ""', String, '')
+    .option('-f, --format [module format]', 'Regex and value which will be applied to the file name when generating the module name. Example: "/_/g,-". Default: ""', parseList)
+    .option('-k, --keepExtension [keep file extension]', 'Should it keep the file extension when it generates module name. Default: false')
+    .option('-l, --lowerCase [lower case]', 'Convert file name to lower case before to use it as module name. Default: false')
+    .option('-o, --output [file name]', 'Output file to store the generated configuration')
+    .option('-r, --moduleRoot [module root]', 'The folder which will be used as starting point from which the module name should be generated. Default: current working directory', String, process.cwd())
     .version(require('./package.json').version)
     .parse(process.argv);
 
@@ -121,7 +128,7 @@ function extractValue(node) {
         return arr;
 
     } else if (node.type === 'FunctionExpression') {
-        return escodegen.generate(node);
+        return recast.print(node).code;
     }
 }
 
@@ -156,18 +163,71 @@ function generateConfig() {
     });
 }
 
+function generateModuleName(file) {
+    var ext;
+
+    if (!program.keepExtension) {
+        ext = program.extension || path.extname(file);
+    }
+
+    var filePath = file;
+
+    var relativeDir = path.normalize(program.moduleRoot);
+
+    var relativeDirIndex = filePath.indexOf(relativeDir);
+
+    if (relativeDirIndex === 0) {
+        filePath = filePath.substring(relativeDir.length);
+    }
+
+    var fileName = path.basename(filePath, ext);
+
+    if (program.format) {
+        var formatRegex = program.format[0].split('/');
+        formatRegex = new RegExp(formatRegex[1], formatRegex[2]);
+
+        var replaceValue = program.format[1];
+
+        fileName = fileName.replace(formatRegex, replaceValue);
+    }
+
+    var moduleName = path.join(path.dirname(filePath), fileName);
+
+    if (program.lowerCase) {
+        moduleName = moduleName.toLowerCase();
+    }
+
+    return moduleName;
+}
+
 function getConfig(file, ast) {
     return new Promise(function(resolve, reject) {
         var result = [];
 
         jsstana.traverse(ast, function (node) {
-            var match = jsstana.match('(call define ? ? ?)', node);
+            var match = jsstana.match('(or (call define ? ?) (call define ? ? ?))', node);
 
             if (match) {
+                var dependencies;
+                var moduleName;
+
+                // If the module does not have an module id, generate it.
+                if (node.arguments.length === 2) {
+                    moduleName = generateModuleName(file);
+                    dependencies = node.arguments[0];
+
+                    // Add the module name and save the file back.
+                    node.arguments.unshift(builders.literal(moduleName));
+                    fs.writeFileSync(file, recast.prettyPrint(ast, {wrapColumn: 1024}).code);
+                } else {
+                    moduleName = node.arguments[0].value;
+                    dependencies = node.arguments[1];
+                }
+
                 var config = {
                     file: path.basename(file),
-                    name: node.arguments[0].value,
-                    dependencies: extractValue(node.arguments[1])
+                    name: moduleName,
+                    dependencies: extractValue(dependencies)
                 };
 
                 var values = extractCondition(node);
