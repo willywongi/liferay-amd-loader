@@ -373,7 +373,7 @@ var LoaderProtoMethods = {
     },
 
     /**
-     * Loads list of modules.
+     * Loads a list of modules. If the module wasn't requested, loads its script.
      *
      * @memberof! Loader#
      * @protected
@@ -384,49 +384,34 @@ var LoaderProtoMethods = {
         var self = this;
 
         return new Promise(function(resolve, reject) {
+            var promisesToResolve = [];
+
             // First, detect any not yet requested modules
             var notRequestedModules = self._filterNotRequestedModules(moduleNames);
 
             if (notRequestedModules.length) {
                 // If there are not yet requested modules, construct their URLs
                 var urls = self._getURLBuilder().build(notRequestedModules);
-
-                var pendingScripts = [];
+                console.log('SCRIPTS', urls);
 
                 // Create promises for each of the scripts, which should be loaded
                 for (var i = 0; i < urls.length; i++) {
-                    pendingScripts.push(self._loadScript(urls[i]));
+                    promisesToResolve.push(self._loadScript(urls[i]));
                 }
-
-                // Wait for resolving all script Promises
-                // As soon as that happens, wait for each module to define itself
-
-                console.log('SCRIPTS', urls);
-                Promise.all(pendingScripts).then(function(loadedScripts) {
-                    return self._waitForModules(moduleNames);
-                })
-                // As soon as all scripts were loaded and all dependencies have been resolved,
-                // resolve the main Promise
-                .then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If any script fails to load or other error happens,
-                // reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
-            } else {
-                // If there are no any missing modules, just wait for modules dependencies
-                // to be resolved and then resolve the main promise
-                self._waitForModules(moduleNames).then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If some error happens, for example if some module implementation
-                // throws error, reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
             }
+
+            promisesToResolve.push(self._waitForModules(moduleNames));
+
+            Promise.all(promisesToResolve).then(function(loadedModules) {
+                promisesToResolve.length = 0;
+
+                resolve(loadedModules);
+            })
+            // If some error happens, for example if some module implementation
+            // throws error, reject the main Promise
+            .catch(function(error) {
+                reject(error);
+            });
         });
     },
 
