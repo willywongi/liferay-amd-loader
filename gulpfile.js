@@ -140,7 +140,7 @@ gulp.task('modules', ['copy-bower', 'modules2'], function() {
 
 gulp.task('test', ['build'], function(done) {
     var streamStripDebug = gulp.src(['umd/**/*.js', '!umd/event-emitter.js'])
-        .pipe(stripDebug());
+        // .pipe(stripDebug());
 
     var streamEventEmitter = gulp.src('umd/event-emitter.js');
 

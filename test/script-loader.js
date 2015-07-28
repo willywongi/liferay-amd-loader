@@ -264,6 +264,35 @@ describe('Loader', function() {
         }, 50);
     });
 
+    it.only('should load module which implementation is an object', function(done) {
+        var moduleName = Math.random().toString();
+
+        Loader.addModule({
+            name: 'impl_as_object',
+            dependencies: ['exports'],
+            path: '/modules2/impl_as_object.js'
+        });
+
+        var failure = sinon.spy(function(error) {
+            console.log('ERROR', error);
+        });
+
+        var implementation;
+        var success = sinon.spy(function(impl) {
+            implementation = impl;
+        });
+
+        Loader.require('impl_as_object', success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(failure.notCalled, 'Failure should not be called');
+            assert.isTrue(success.calledOnce, 'Success should be called');
+            assert.isObject(implementation, 'The implementation should be an object');
+
+            done();
+        }, 50);
+    });
+
     it('should fail on registered but not existing file', function (done) {
         var failure = sinon.stub();
         var success = sinon.stub();
