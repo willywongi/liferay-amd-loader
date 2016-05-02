@@ -83,55 +83,58 @@ var LoaderProtoMethods = {
      *              global namespace. In this way you can load legacy modules.
      *          &lt;/li>
      *     &lt;/ul>
-     * @return {Object} The constructed module.
      */
     define: function(name, dependencies, implementation, config) {
+        var self = this;
+
         console.log('DEFINE', name, dependencies);
+
+        config = config || {};
 
         var passedArgsCount = arguments.length;
 
+        config.anonymous = false;
+
         if (passedArgsCount &lt; 2) {
-            console.log('DEFINE, module with one param only, returning');
-            // we don't support modules with implementation only
-            return;
+            console.log('DEFINE, module with one param only, this should be anonymous module');
+            implementation = arguments[0];
+            dependencies = ['module', 'exports'];
+            config.anonymous = true;
         } else if (passedArgsCount === 2) {
             if (typeof name === 'string') {
                 console.log('DEFINE, module with two params only, name and implementation', name);
                 // there are two parameters, but the first one is not an array with dependencies,
                 // this is a module name
-                implementation = dependencies;
                 dependencies = ['module', 'exports'];
+                implementation = arguments[1];
             } else {
-                // anonymous module, we don't support this
-                return;
+                console.log('DEFINE, module with one param only, this should be anonymous module');
+                dependencies = arguments[0];
+                implementation = arguments[1];
+                config.anonymous = true;
             }
         }
 
-        // Create a new module by merging the provided config with the passed name,
-        // dependencies and implementation.
-        var module = config || {};
-        var configParser = this._getConfigParser();
+        if (config.anonymous) {
+            // Postpone module's registration till the next scriptLoaded event
+            var onScriptLoaded = function(loadedModules) {
+                self.off('scriptLoaded', onScriptLoaded);
 
-        var pathResolver = this._getPathResolver();
+                if (loadedModules.length !== 1) {
+                    throw new Error('Multiple anonymous modules cannot be served via combo service. ' +
+                        'Please set `combine` to `false` or describe the modules in the config ' +
+                        'and mark them as anonymous.', loadedModules);
+                } else {
+                    var moduleName = loadedModules[0];
+                    self._define(moduleName, dependencies, implementation, config);
+                }
+            };
 
-        // Resolve the path according to the parent module. Example:
-        // define('metal/src/component/component', ['../array/array']) will become:
-        // define('metal/src/component/component', ['metal/src/array/array'])
-        dependencies = dependencies.map(function(dependency) {
-            return pathResolver.resolvePath(name, dependency);
-        });
-
-        module.name = name;
-        module.dependencies = dependencies;
-        module.pendingImplementation = implementation;
-
-        configParser.addModule(module);
-
-        if (!this._modulesMap[module.name]) {
-            this._modulesMap[module.name] = true;
+            self.on('scriptLoaded', onScriptLoaded);
+        } else {
+            // This is not an anonymous module, go directly to module's registration flow
+            this._define(name, dependencies, implementation, config);
         }
-
-        this.emit('moduleRegister', name);
     },
 
     /**
@@ -285,7 +288,21 @@ var LoaderProtoMethods = {
                 if (!!exportedValue) {
                     resolve(exportedValue);
                 } else {
-                    reject(new Error('Module ' + moduleName + ' does not export the specified value: ' + module.exports));
+                    var onScriptLoaded = function(loadedModules) {
+                        if (loadedModules.indexOf(moduleName) >= 0) {
+                            self.off('scriptLoaded', onScriptLoaded);
+
+                            var exportedValue = self._getValueGlobalNS(module.exports);
+
+                            if (!!exportedValue) {
+                                resolve(exportedValue);
+                            } else {
+                                reject(new Error('Module ' + moduleName + ' does not export the specified value: ' + module.exports));
+                            }
+                        }
+                    };
+
+                    self.on('scriptLoaded', onScriptLoaded);
                 }
             } else {
                 var onModuleRegister = function(registeredModuleName) {
@@ -303,6 +320,45 @@ var LoaderProtoMethods = {
                 self.on('moduleRegister', onModuleRegister);
             }
         });
+    },
+
+    /**
+     * Defines a module in the system and fires {@link Loader#event:moduleRegister} event with the registered module as param.
+     * Called internally by {@link Loader#define} method once it normalizes the passed arguments.
+     *
+     * @memberof! Loader#
+     * @protected
+     * @param {string} name The name of the module.
+     * @param {array} dependencies List of module dependencies.
+     * @param {function} implementation The implementation of the module.
+     * @param {object=} config See {@link Loader:define} for more details.
+     */
+    _define: function(name, dependencies, implementation, config) {
+        // Create a new module by merging the provided config with the passed name,
+        // dependencies and implementation.
+        var module = config || {};
+        var configParser = this._getConfigParser();
+
+        var pathResolver = this._getPathResolver();
+
+        // Resolve the path according to the parent module. Example:
+        // define('metal/src/component/component', ['../array/array']) will become:
+        // define('metal/src/component/component', ['metal/src/array/array'])
+        dependencies = dependencies.map(function(dependency) {
+            return pathResolver.resolvePath(name, dependency);
+        });
+
+        module.name = name;
+        module.dependencies = dependencies;
+        module.pendingImplementation = implementation;
+
+        configParser.addModule(module);
+
+        if (!this._modulesMap[module.name]) {
+            this._modulesMap[module.name] = true;
+        }
+
+        this.emit('moduleRegister', name);
     },
 
     /**
@@ -434,25 +490,49 @@ var LoaderProtoMethods = {
     },
 
     /**
-     * Filters a list of modules and returns only these which have been not yet requested for delivery via network.
+     * Filters a list of modules and returns only these which don't have any of the provided list
+     * of properties.
      *
      * @memberof! Loader#
      * @protected
-     * @param {array} modules List of modules which which will be filtered.
-     * @return {array} List of modules not yet requested for delivery via network.
+     * @param {array} modules List of modules which which have to be filtered.
+     * @return {array} List of modules matching the specified filter.
      */
-    _filterNotRequestedModules: function(modules) {
+    _filterModulesByProperty: function(moduleNames, property) {
+        var properties = property;
+
+        if (typeof property === 'string') {
+            properties = [property];
+        }
+
         var missingModules = [];
 
         var registeredModules = this._getConfigParser().getModules();
 
-        for (var i = 0; i &lt; modules.length; i++) {
-            var registeredModule = registeredModules[modules[i]];
+        for (var i = 0; i &lt; moduleNames.length; i++) {
+            var moduleName = moduleNames[i];
 
-            // Get all modules which are not yet requested from the server.
+            var registeredModule = registeredModules[moduleNames[i]];
+
+            if (!registeredModule) {
+                missingModules.push(moduleName);
+                continue;
+            }
+
             // We exclude "exports" and "module" modules, which are part of AMD spec.
-            if ((registeredModule !== 'exports' &amp;&amp; registeredModule !== 'module') &amp;&amp; (!registeredModule || !registeredModule.requested)) {
-                missingModules.push(modules[i]);
+            if (registeredModule === 'exports' || registeredModule === 'module') {
+                continue;
+            }
+
+            for (var found = 0, j = 0; j &lt; properties.length; j++) {
+                if (registeredModule[properties[j]]) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                missingModules.push(moduleName);
             }
         }
 
@@ -471,48 +551,48 @@ var LoaderProtoMethods = {
         var self = this;
 
         return new Promise(function(resolve, reject) {
-            // First, detect any not yet requested modules
-            var notRequestedModules = self._filterNotRequestedModules(moduleNames);
+            // Get all modules without pending implementation or not yet requested
+            var modulesForLoading = self._filterModulesByProperty(moduleNames, ['requested', 'pendingImplementation']);
 
-            if (notRequestedModules.length) {
-                // If there are not yet requested modules, construct their URLs
-                var urls = self._getURLBuilder().build(notRequestedModules);
+            if (modulesForLoading.length) {
+                // If there are modules, which have to be loaded, construct their URLs
+                var modulesURL = self._getURLBuilder().build(modulesForLoading);
 
                 var pendingScripts = [];
 
                 // Create promises for each of the scripts, which should be loaded
-                for (var i = 0; i &lt; urls.length; i++) {
-                    pendingScripts.push(self._loadScript(urls[i]));
+                for (var i = 0; i &lt; modulesURL.length; i++) {
+                    pendingScripts.push(self._loadScript(modulesURL[i]));
                 }
 
                 // Wait for resolving all script Promises
                 // As soon as that happens, wait for each module to define itself
 
-                console.log('SCRIPTS', urls);
+                console.log('SCRIPTS', modulesURL);
                 Promise.all(pendingScripts).then(function(loadedScripts) {
-                    return self._waitForModules(moduleNames);
-                })
-                // As soon as all scripts were loaded and all dependencies have been resolved,
-                // resolve the main Promise
-                .then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If any script fails to load or other error happens,
-                // reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
+                        return self._waitForModules(moduleNames);
+                    })
+                    // As soon as all scripts were loaded and all dependencies have been resolved,
+                    // resolve the main Promise
+                    .then(function(loadedModules) {
+                        resolve(loadedModules);
+                    })
+                    // If any script fails to load or other error happens,
+                    // reject the main Promise
+                    .catch(function(error) {
+                        reject(error);
+                    });
             } else {
                 // If there are no any missing modules, just wait for modules dependencies
                 // to be resolved and then resolve the main promise
                 self._waitForModules(moduleNames).then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If some error happens, for example if some module implementation
-                // throws error, reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
+                        resolve(loadedModules);
+                    })
+                    // If some error happens, for example if some module implementation
+                    // throws error, reject the main Promise
+                    .catch(function(error) {
+                        reject(error);
+                    });
             }
         });
     },
@@ -522,14 +602,18 @@ var LoaderProtoMethods = {
      *
      * @memberof! Loader#
      * @protected
-     * @param {string} url The src of the script.
+     * @param {object} modulesURL An Object with two properties:
+     * - modules - List of the modules which should be loaded
+     * - url - The URL from which the modules should be loaded
      * @return {Promise} Promise which will be resolved as soon as the script is being loaded.
      */
-    _loadScript: function(url) {
+    _loadScript: function(modulesURL) {
+        var self = this;
+
         return new Promise(function(resolve, reject) {
             var script = document.createElement('script');
 
-            script.src = url;
+            script.src = modulesURL.url;
 
             // On ready state change is needed for IE &lt; 9, not sure if that is needed anymore,
             // it depends which browsers will we support at the end
@@ -539,17 +623,19 @@ var LoaderProtoMethods = {
                     script.onload = script.onreadystatechange = null;
 
                     resolve(script);
+
+                    self.emit('scriptLoaded', modulesURL.modules);
                 }
             };
 
             // If some script fails to load, reject the main Promise
             script.onerror = function() {
-                document.body.removeChild(script);
+                document.head.removeChild(script);
 
                 reject(script);
             };
 
-            document.body.appendChild(script);
+            document.head.appendChild(script);
         });
     },
 
@@ -612,7 +698,7 @@ var LoaderProtoMethods = {
 
                     dependencyImplementations.push(exportsImpl);
                 } else if (dependency === 'module') {
-                    exportsImpl = {exports: {}};
+                    exportsImpl = { exports: {} };
 
                     dependencyImplementations.push(exportsImpl);
                 } else {
@@ -699,7 +785,7 @@ var LoaderProtoMethods = {
                 // get the implementation from the module.
                 var registeredModules = self._getConfigParser().getModules();
 
-                var defineModules = function () {
+                var defineModules = function() {
                     var definedModules = [];
 
                     for (var i = 0; i &lt; moduleNames.length; i++) {
@@ -733,7 +819,8 @@ var LoaderProtoMethods = {
 
 Object.keys(LoaderProtoMethods).forEach(function(key) {
     Loader.prototype[key] = LoaderProtoMethods[key];
-});</code></pre>
+});
+</code></pre>
         </article>
     </section>
 
@@ -749,7 +836,7 @@ Object.keys(LoaderProtoMethods).forEach(function(key) {
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Sun Dec 20 2015 09:36:44 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Fri Apr 29 2016 22:02:54 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

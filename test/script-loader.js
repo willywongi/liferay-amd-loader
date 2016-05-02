@@ -2,6 +2,9 @@
 
 require('./fixture/common.js');
 require('./fixture/script.js');
+
+var fs = require('fs');
+
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
@@ -403,6 +406,30 @@ describe('Loader', function() {
         }, 50);
     });
 
+    it('should load module with "exports" dependency twice', function(done) {
+        var failure = sinon.stub();
+
+        var successValue;
+        var success = sinon.spy(function(val) {
+            successValue = val;
+        });
+
+        Loader.require(['exports-dep'], success, failure);
+        Loader.require(['exports-dep'], success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(failure.notCalled, 'Failure should be not called');
+            assert.isTrue(success.calledTwice, 'Success should be called twice');
+
+            assert.isObject(successValue);
+            assert.property(successValue, 'default');
+            assert.isFunction(successValue.default);
+            assert.strictEqual('alabala', successValue.default.name);
+
+            done();
+        }, 50);
+    });
+
     it('should load module with "module" dependency', function(done) {
         var failure = sinon.stub();
 
@@ -501,7 +528,7 @@ describe('Loader', function() {
         }, 50);
     });
 
-    it('should failure after require timeout, but a valid module should still load', function(done) {
+    it('should fail after a require timeout, but a valid module should still be loaded', function(done) {
         global.__CONFIG__.waitTimeout = 1;
         global.__CONFIG__.paths['delay'] = '/modules2/delay';
 
@@ -520,11 +547,12 @@ describe('Loader', function() {
             // Delay module adds "delay" property to global
             assert.strictEqual(1, global.delay);
 
+            delete global.delay;
             done();
         }, 50);
     });
 
-    it('should load modules which do not expose a define function', function(done) {
+    it('should load modules which don\'t expose a define function', function(done) {
         Loader.addModule({
             dependencies: [],
             exports: '_',
@@ -547,7 +575,214 @@ describe('Loader', function() {
             var modules = Loader.getModules();
             assert.property(modules['underscore'], 'implementation');
 
+            delete global['_'];
             done();
         }, 50);
+    });
+
+    it('should load modules which don\'t expose a define function twice', function(done) {
+        Loader.addModule({
+            dependencies: [],
+            exports: '_',
+            name: 'underscore',
+            path: '/modules2/underscore.js'
+        });
+
+        var failure = sinon.spy(function(error) {
+            console.error(error);
+        });
+        var success = sinon.stub();
+
+        Loader.require(['underscore'], success, failure);
+        Loader.require(['underscore'], success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(failure.notCalled, 'Failure should not be called');
+            assert.isTrue(success.calledTwice, 'Success should be called twice');
+            assert.property(global, '_');
+
+            var modules = Loader.getModules();
+            assert.property(modules['underscore'], 'implementation');
+
+            delete global['_'];
+            done();
+        }, 50);
+    });
+
+    it('should load modules which don\'t expose a define function twice and regular ones together', function(done) {
+        Loader.addModule({
+            dependencies: [],
+            exports: '_',
+            name: 'underscore',
+            path: '/modules2/underscore.js'
+        });
+
+        Loader.addModule({
+            dependencies: [],
+            exports: '$',
+            name: 'dollar',
+            path: '/modules2/dollar.js'
+        });
+
+        var failure = sinon.spy(function(error) {
+            console.error(error);
+        });
+        var success = sinon.stub();
+
+        Loader.require('module1', success, failure);
+        Loader.require(['underscore', 'dollar'], success, failure);
+        Loader.require(['underscore'], success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(failure.notCalled, 'Failure should not be called');
+            assert.isTrue(success.calledThrice, 'Success should be called thrice');
+            assert.property(global, '_');
+            assert.property(global, '$');
+
+            var modules = Loader.getModules();
+            assert.property(modules['underscore'], 'implementation');
+
+            delete global['_'];
+            delete global['$'];
+            done();
+        }, 50);
+    });
+
+    it('should not request module if added explicitly', function(done) {
+        var module = {
+            name: 'added_explicitly',
+            dependencies: ['exports'],
+            path: '/modules2/added_explicitly.js'
+        };
+
+        Loader.addModule(module);
+
+        Loader.define(module.name, module.dependencies, function() {});
+
+        var failure = sinon.stub();
+        var success = sinon.stub();
+
+        var origAppendChild = document.head.appendChild;
+
+        document.head.appendChild = sinon.spy(document.head.appendChild);
+
+        Loader.require('added_explicitly', success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(document.head.appendChild.notCalled, 'document.head.appendChild shouldn\'t be called');
+            assert.isTrue(failure.notCalled, 'Failure should be not called');
+            assert.isTrue(success.calledOnce, 'Success should be called once');
+
+            document.head.appendChild = origAppendChild;
+
+            done();
+        }, 50);
+    });
+
+    it('should load modules even when same module is requested second time with another module', function(done) {
+        var failure = sinon.stub();
+        var success = sinon.stub();
+
+        Loader.require(['module3'], success, failure);
+        Loader.require(['module3', 'module7'], success, failure);
+
+        setTimeout(function() {
+            assert.isTrue(failure.notCalled, 'Failure should be not called');
+            assert.isTrue(success.calledTwice, 'Success should be called twice');
+
+            done();
+        }, 50);
+    });
+
+    describe('when working with anonymous modules', function() {
+        beforeEach(function() {
+            Object.keys(require.cache).forEach(function(cache) {
+                delete require.cache[cache];
+            });
+
+            global.__CONFIG__ = {
+                url: __dirname + '/fixture',
+                basePath: '/modules3'
+            };
+
+            Object.keys(require.cache).forEach(function(cache) {
+                delete require.cache[cache];
+            });
+
+            require('../umd/config-parser.js');
+            require('../umd/event-emitter.js');
+            require('../umd/script-loader.js');
+        });
+
+        it('should load multiple anonymous modules', function(done) {
+            var failure = sinon.stub();
+            var success = sinon.stub();
+
+            Loader.require(['a', 'b', 'c'], success, failure);
+
+            setTimeout(function() {
+                assert.isTrue(failure.notCalled, 'Failure should be not called');
+                assert.isTrue(success.calledOnce, 'Success should be called once');
+
+                done();
+            }, 50);
+        });
+
+        it('should load anonymous modules with anonymous dependencies', function(done) {
+            var failure = sinon.stub();
+            var success = sinon.stub();
+
+            Loader.require(['d'], success, failure);
+
+            setTimeout(function() {
+                assert.isTrue(failure.notCalled, 'Failure should be not called');
+                assert.isTrue(success.calledOnce, 'Success should be called once');
+
+                done();
+            }, 50);
+        });
+
+        it('should load non-anonymous modules with anonymous dependencies', function(done) {
+            var failure = sinon.stub();
+            var success = sinon.stub();
+
+            Loader.require(['e'], success, failure);
+
+            setTimeout(function() {
+                assert.isTrue(success.calledOnce, 'Success should be called once');
+                assert.isTrue(failure.notCalled, 'Failure should not be called');
+
+                done();
+            }, 50);
+        });
+
+        it('should load anonymous modules with non-anonymous dependencies', function(done) {
+            var failure = sinon.stub();
+            var success = sinon.stub();
+
+            Loader.require(['f'], success, failure);
+
+            setTimeout(function() {
+                assert.isTrue(failure.notCalled, 'Failure should be not called');
+                assert.isTrue(success.calledOnce, 'Success should be called once');
+
+                done();
+            }, 50);
+        });
+
+        it('should mark anonymous modules', function() {
+            var moduleName = 'foo';
+
+            Loader.define(function(){});
+            Loader.emit('scriptLoaded', [moduleName]);
+            var modules = Loader.getModules();
+
+            assert.property(modules, moduleName);
+
+            var module = modules[moduleName];
+            assert.isObject(module);
+            assert.propertyVal(module, 'name', moduleName);
+            assert.propertyVal(module, 'anonymous', true);
+        });
     });
 });

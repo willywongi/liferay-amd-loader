@@ -3,276 +3,956 @@
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.0.0
+ * @version   3.1.2
  */
 
-(function () {
-    function r(a, b) {
-        n[l] = a;
-        n[l + 1] = b;
-        l += 2;
-        2 === l && A()
+(function() {
+    "use strict";
+    function lib$es6$promise$utils$$objectOrFunction(x) {
+      return typeof x === 'function' || (typeof x === 'object' && x !== null);
     }
-    function s(a) {
-        return "function" === typeof a
-    }
-    function F() {
-        return function () {
-            process.nextTick(t)
-        }
-    }
-    function G() {
-        var a = 0,
-            b = new B(t),
-            c = document.createTextNode("");
-        b.observe(c, {
-            characterData: !0
-        });
-        return function () {
-            c.data = a = ++a % 2
-        }
-    }
-    function H() {
-        var a = new MessageChannel;
-        a.port1.onmessage = t;
-        return function () {
-            a.port2.postMessage(0)
-        }
-    }
-    function I() {
-        return function () {
-            setTimeout(t, 1)
-        }
-    }
-    function t() {
-        for (var a = 0; a < l; a += 2)(0, n[a])(n[a + 1]), n[a] = void 0, n[a + 1] = void 0;
-        l = 0
-    }
-    function p() {}
-    function J(a, b, c, d) {
-        try {
-            a.call(b, c, d)
-        } catch (e) {
-            return e
-        }
-    }
-    function K(a, b, c) {
-        r(function (a) {
-            var e = !1,
-                f = J(c, b, function (c) {
-                    e || (e = !0, b !== c ? q(a, c) : m(a, c))
-                }, function (b) {
-                    e || (e = !0, g(a, b))
-                });
-            !e && f && (e = !0, g(a, f))
-        }, a)
-    }
-    function L(a, b) {
-        1 === b.a ? m(a, b.b) : 2 === a.a ? g(a, b.b) : u(b, void 0, function (b) {
-            q(a, b)
-        }, function (b) {
-            g(a, b)
-        })
-    }
-    function q(a, b) {
-        if (a === b) g(a, new TypeError("You cannot resolve a promise with itself"));
-        else if ("function" === typeof b || "object" === typeof b && null !== b) if (b.constructor === a.constructor) L(a, b);
-        else {
-            var c;
-            try {
-                c = b.then
-            } catch (d) {
-                v.error = d, c = v
-            }
-            c === v ? g(a, v.error) : void 0 === c ? m(a, b) : s(c) ? K(a, b, c) : m(a, b)
-        } else m(a, b)
-    }
-    function M(a) {
-        a.f && a.f(a.b);
-        x(a)
-    }
-    function m(a, b) {
-        void 0 === a.a && (a.b = b, a.a = 1, 0 !== a.e.length && r(x, a))
-    }
-    function g(a, b) {
-        void 0 === a.a && (a.a = 2, a.b = b, r(M, a))
-    }
-    function u(a, b, c, d) {
-        var e = a.e,
-            f = e.length;
-        a.f = null;
-        e[f] = b;
-        e[f + 1] = c;
-        e[f + 2] = d;
-        0 === f && a.a && r(x, a)
-    }
-    function x(a) {
-        var b = a.e,
-            c = a.a;
-        if (0 !== b.length) {
-            for (var d, e, f = a.b, g = 0; g < b.length; g += 3) d = b[g], e = b[g + c], d ? C(c, d, e, f) : e(f);
-            a.e.length = 0
-        }
-    }
-    function D() {
-        this.error =
-        null
-    }
-    function C(a, b, c, d) {
-        var e = s(c),
-            f, k, h, l;
-        if (e) {
-            try {
-                f = c(d)
-            } catch (n) {
-                y.error = n, f = y
-            }
-            f === y ? (l = !0, k = f.error, f = null) : h = !0;
-            if (b === f) {
-                g(b, new TypeError("A promises callback cannot return that same promise."));
-                return
-            }
-        } else f = d, h = !0;
-        void 0 === b.a && (e && h ? q(b, f) : l ? g(b, k) : 1 === a ? m(b, f) : 2 === a && g(b, f))
-    }
-    function N(a, b) {
-        try {
-            b(function (b) {
-                q(a, b)
-            }, function (b) {
-                g(a, b)
-            })
-        } catch (c) {
-            g(a, c)
-        }
-    }
-    function k(a, b, c, d) {
-        this.n = a;
-        this.c = new a(p, d);
-        this.i = c;
-        this.o(b) ? (this.m = b, this.d = this.length = b.length, this.l(), 0 === this.length ? m(this.c, this.b) : (this.length = this.length || 0, this.k(), 0 === this.d && m(this.c, this.b))) : g(this.c, this.p())
-    }
-    function h(a) {
-        O++;
-        this.b = this.a = void 0;
-        this.e = [];
-        if (p !== a) {
-            if (!s(a)) throw new TypeError("You must pass a resolver function as the first argument to the promise constructor");
-            if (!(this instanceof h)) throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-            N(this, a)
-        }
-    }
-    var E = Array.isArray ? Array.isArray : function (a) {
-        return "[object Array]" === Object.prototype.toString.call(a)
-    },
-        l = 0,
-        w = "undefined" !== typeof window ? window : {},
-        B = w.MutationObserver || w.WebKitMutationObserver,
-        w = "undefined" !== typeof Uint8ClampedArray && "undefined" !== typeof importScripts && "undefined" !== typeof MessageChannel,
-        n = Array(1E3),
-        A;
-    A = "undefined" !== typeof process && "[object process]" === {}.toString.call(process) ? F() : B ? G() : w ? H() : I();
-    var v = new D,
-        y = new D;
-    k.prototype.o = function (a) {
-        return E(a)
-    };
-    k.prototype.p = function () {
-        return Error("Array Methods must be provided an Array")
-    };
-    k.prototype.l =
 
-    function () {
-        this.b = Array(this.length)
-    };
-    k.prototype.k = function () {
-        for (var a = this.length, b = this.c, c = this.m, d = 0; void 0 === b.a && d < a; d++) this.j(c[d], d)
-    };
-    k.prototype.j = function (a, b) {
-        var c = this.n;
-        "object" === typeof a && null !== a ? a.constructor === c && void 0 !== a.a ? (a.f = null, this.g(a.a, b, a.b)) : this.q(c.resolve(a), b) : (this.d--, this.b[b] = this.h(a))
-    };
-    k.prototype.g = function (a, b, c) {
-        var d = this.c;
-        void 0 === d.a && (this.d--, this.i && 2 === a ? g(d, c) : this.b[b] = this.h(c));
-        0 === this.d && m(d, this.b)
-    };
-    k.prototype.h = function (a) {
-        return a
-    };
-    k.prototype.q = function (a, b) {
-        var c = this;
-        u(a, void 0, function (a) {
-            c.g(1, b, a)
-        }, function (a) {
-            c.g(2, b, a)
-        })
-    };
-    var O = 0;
-    h.all = function (a, b) {
-        return (new k(this, a, !0, b)).c
-    };
-    h.race = function (a, b) {
-        function c(a) {
-            q(e, a)
+    function lib$es6$promise$utils$$isFunction(x) {
+      return typeof x === 'function';
+    }
+
+    function lib$es6$promise$utils$$isMaybeThenable(x) {
+      return typeof x === 'object' && x !== null;
+    }
+
+    var lib$es6$promise$utils$$_isArray;
+    if (!Array.isArray) {
+      lib$es6$promise$utils$$_isArray = function (x) {
+        return Object.prototype.toString.call(x) === '[object Array]';
+      };
+    } else {
+      lib$es6$promise$utils$$_isArray = Array.isArray;
+    }
+
+    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
+    var lib$es6$promise$asap$$len = 0;
+    var lib$es6$promise$asap$$vertxNext;
+    var lib$es6$promise$asap$$customSchedulerFn;
+
+    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
+      lib$es6$promise$asap$$len += 2;
+      if (lib$es6$promise$asap$$len === 2) {
+        // If len is 2, that means that we need to schedule an async flush.
+        // If additional callbacks are queued before the queue is flushed, they
+        // will be processed by this flush that we are scheduling.
+        if (lib$es6$promise$asap$$customSchedulerFn) {
+          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
+        } else {
+          lib$es6$promise$asap$$scheduleFlush();
         }
-        function d(a) {
-            g(e, a)
+      }
+    }
+
+    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
+      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
+    }
+
+    function lib$es6$promise$asap$$setAsap(asapFn) {
+      lib$es6$promise$asap$$asap = asapFn;
+    }
+
+    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
+    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
+    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
+    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+
+    // test for web worker but not in IE10
+    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
+      typeof importScripts !== 'undefined' &&
+      typeof MessageChannel !== 'undefined';
+
+    // node
+    function lib$es6$promise$asap$$useNextTick() {
+      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+      // see https://github.com/cujojs/when/issues/410 for details
+      return function() {
+        process.nextTick(lib$es6$promise$asap$$flush);
+      };
+    }
+
+    // vertx
+    function lib$es6$promise$asap$$useVertxTimer() {
+      return function() {
+        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
+      };
+    }
+
+    function lib$es6$promise$asap$$useMutationObserver() {
+      var iterations = 0;
+      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
+      var node = document.createTextNode('');
+      observer.observe(node, { characterData: true });
+
+      return function() {
+        node.data = (iterations = ++iterations % 2);
+      };
+    }
+
+    // web worker
+    function lib$es6$promise$asap$$useMessageChannel() {
+      var channel = new MessageChannel();
+      channel.port1.onmessage = lib$es6$promise$asap$$flush;
+      return function () {
+        channel.port2.postMessage(0);
+      };
+    }
+
+    function lib$es6$promise$asap$$useSetTimeout() {
+      return function() {
+        setTimeout(lib$es6$promise$asap$$flush, 1);
+      };
+    }
+
+    var lib$es6$promise$asap$$queue = new Array(1000);
+    function lib$es6$promise$asap$$flush() {
+      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
+        var callback = lib$es6$promise$asap$$queue[i];
+        var arg = lib$es6$promise$asap$$queue[i+1];
+
+        callback(arg);
+
+        lib$es6$promise$asap$$queue[i] = undefined;
+        lib$es6$promise$asap$$queue[i+1] = undefined;
+      }
+
+      lib$es6$promise$asap$$len = 0;
+    }
+
+    function lib$es6$promise$asap$$attemptVertx() {
+      try {
+        var r = require;
+        var vertx = r('vertx');
+        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
+        return lib$es6$promise$asap$$useVertxTimer();
+      } catch(e) {
+        return lib$es6$promise$asap$$useSetTimeout();
+      }
+    }
+
+    var lib$es6$promise$asap$$scheduleFlush;
+    // Decide what async method to use to triggering processing of queued callbacks:
+    if (lib$es6$promise$asap$$isNode) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
+    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
+    } else if (lib$es6$promise$asap$$isWorker) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
+    } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertx();
+    } else {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
+    }
+    function lib$es6$promise$then$$then(onFulfillment, onRejection) {
+      var parent = this;
+      var state = parent._state;
+
+      if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
+        return this;
+      }
+
+      var child = new this.constructor(lib$es6$promise$$internal$$noop);
+      var result = parent._result;
+
+      if (state) {
+        var callback = arguments[state - 1];
+        lib$es6$promise$asap$$asap(function(){
+          lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
+        });
+      } else {
+        lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
+      }
+
+      return child;
+    }
+    var lib$es6$promise$then$$default = lib$es6$promise$then$$then;
+    function lib$es6$promise$promise$resolve$$resolve(object) {
+      /*jshint validthis:true */
+      var Constructor = this;
+
+      if (object && typeof object === 'object' && object.constructor === Constructor) {
+        return object;
+      }
+
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$resolve(promise, object);
+      return promise;
+    }
+    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
+
+    function lib$es6$promise$$internal$$noop() {}
+
+    var lib$es6$promise$$internal$$PENDING   = void 0;
+    var lib$es6$promise$$internal$$FULFILLED = 1;
+    var lib$es6$promise$$internal$$REJECTED  = 2;
+
+    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+    function lib$es6$promise$$internal$$selfFulfillment() {
+      return new TypeError("You cannot resolve a promise with itself");
+    }
+
+    function lib$es6$promise$$internal$$cannotReturnOwn() {
+      return new TypeError('A promises callback cannot return that same promise.');
+    }
+
+    function lib$es6$promise$$internal$$getThen(promise) {
+      try {
+        return promise.then;
+      } catch(error) {
+        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
+        return lib$es6$promise$$internal$$GET_THEN_ERROR;
+      }
+    }
+
+    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+      try {
+        then.call(value, fulfillmentHandler, rejectionHandler);
+      } catch(e) {
+        return e;
+      }
+    }
+
+    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
+       lib$es6$promise$asap$$asap(function(promise) {
+        var sealed = false;
+        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
+          if (sealed) { return; }
+          sealed = true;
+          if (thenable !== value) {
+            lib$es6$promise$$internal$$resolve(promise, value);
+          } else {
+            lib$es6$promise$$internal$$fulfill(promise, value);
+          }
+        }, function(reason) {
+          if (sealed) { return; }
+          sealed = true;
+
+          lib$es6$promise$$internal$$reject(promise, reason);
+        }, 'Settle: ' + (promise._label || ' unknown promise'));
+
+        if (!sealed && error) {
+          sealed = true;
+          lib$es6$promise$$internal$$reject(promise, error);
         }
-        var e = new this(p, b);
-        if (!E(a)) return (g(e, new TypeError("You must pass an array to race.")), e);
-        for (var f = a.length, h = 0; void 0 === e.a && h < f; h++) u(this.resolve(a[h]), void 0, c, d);
-        return e
-    };
-    h.resolve = function (a, b) {
-        if (a && "object" === typeof a && a.constructor === this) return a;
-        var c = new this(p, b);
-        q(c, a);
-        return c
-    };
-    h.reject = function (a, b) {
-        var c = new this(p, b);
-        g(c, a);
-        return c
-    };
-    h.prototype = {
-        constructor: h,
-        then: function (a, b) {
-            var c = this.a;
-            if (1 === c && !a || 2 === c && !b) return this;
-            var d = new this.constructor(p),
-                e = this.b;
-            if (c) {
-                var f = arguments[c - 1];
-                r(function () {
-                    C(c, d, f, e)
-                })
-            } else u(this, d, a, b);
-            return d
-        },
-        "catch": function (a) {
-            return this.then(null, a)
+      }, promise);
+    }
+
+    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
+      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
+      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, thenable._result);
+      } else {
+        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
+          lib$es6$promise$$internal$$resolve(promise, value);
+        }, function(reason) {
+          lib$es6$promise$$internal$$reject(promise, reason);
+        });
+      }
+    }
+
+    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable, then) {
+      if (maybeThenable.constructor === promise.constructor &&
+          then === lib$es6$promise$then$$default &&
+          constructor.resolve === lib$es6$promise$promise$resolve$$default) {
+        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
+      } else {
+        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
+        } else if (then === undefined) {
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+        } else if (lib$es6$promise$utils$$isFunction(then)) {
+          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
+        } else {
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
         }
-    };
-    var z = {
-        Promise: h,
-        polyfill: function () {
-            var a;
-            a = "undefined" !== typeof global ? global : "undefined" !== typeof window && window.document ? window : self;
-            "Promise" in a && "resolve" in a.Promise && "reject" in a.Promise && "all" in a.Promise && "race" in a.Promise &&
-            function () {
-                var b;
-                new a.Promise(function (a) {
-                    b = a
-                });
-                return s(b)
-            }() || (a.Promise = h)
+      }
+    }
+
+    function lib$es6$promise$$internal$$resolve(promise, value) {
+      if (promise === value) {
+        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFulfillment());
+      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
+        lib$es6$promise$$internal$$handleMaybeThenable(promise, value, lib$es6$promise$$internal$$getThen(value));
+      } else {
+        lib$es6$promise$$internal$$fulfill(promise, value);
+      }
+    }
+
+    function lib$es6$promise$$internal$$publishRejection(promise) {
+      if (promise._onerror) {
+        promise._onerror(promise._result);
+      }
+
+      lib$es6$promise$$internal$$publish(promise);
+    }
+
+    function lib$es6$promise$$internal$$fulfill(promise, value) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+
+      promise._result = value;
+      promise._state = lib$es6$promise$$internal$$FULFILLED;
+
+      if (promise._subscribers.length !== 0) {
+        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
+      }
+    }
+
+    function lib$es6$promise$$internal$$reject(promise, reason) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+      promise._state = lib$es6$promise$$internal$$REJECTED;
+      promise._result = reason;
+
+      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
+    }
+
+    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
+      var subscribers = parent._subscribers;
+      var length = subscribers.length;
+
+      parent._onerror = null;
+
+      subscribers[length] = child;
+      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
+      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
+
+      if (length === 0 && parent._state) {
+        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
+      }
+    }
+
+    function lib$es6$promise$$internal$$publish(promise) {
+      var subscribers = promise._subscribers;
+      var settled = promise._state;
+
+      if (subscribers.length === 0) { return; }
+
+      var child, callback, detail = promise._result;
+
+      for (var i = 0; i < subscribers.length; i += 3) {
+        child = subscribers[i];
+        callback = subscribers[i + settled];
+
+        if (child) {
+          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
+        } else {
+          callback(detail);
         }
+      }
+
+      promise._subscribers.length = 0;
+    }
+
+    function lib$es6$promise$$internal$$ErrorObject() {
+      this.error = null;
+    }
+
+    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
+      try {
+        return callback(detail);
+      } catch(e) {
+        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
+        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
+      }
+    }
+
+    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
+      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
+          value, error, succeeded, failed;
+
+      if (hasCallback) {
+        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
+
+        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
+          failed = true;
+          error = value.error;
+          value = null;
+        } else {
+          succeeded = true;
+        }
+
+        if (promise === value) {
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
+          return;
+        }
+
+      } else {
+        value = detail;
+        succeeded = true;
+      }
+
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
+        // noop
+      } else if (hasCallback && succeeded) {
+        lib$es6$promise$$internal$$resolve(promise, value);
+      } else if (failed) {
+        lib$es6$promise$$internal$$reject(promise, error);
+      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, value);
+      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, value);
+      }
+    }
+
+    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
+      try {
+        resolver(function resolvePromise(value){
+          lib$es6$promise$$internal$$resolve(promise, value);
+        }, function rejectPromise(reason) {
+          lib$es6$promise$$internal$$reject(promise, reason);
+        });
+      } catch(e) {
+        lib$es6$promise$$internal$$reject(promise, e);
+      }
+    }
+
+    function lib$es6$promise$promise$all$$all(entries) {
+      return new lib$es6$promise$enumerator$$default(this, entries).promise;
+    }
+    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
+    function lib$es6$promise$promise$race$$race(entries) {
+      /*jshint validthis:true */
+      var Constructor = this;
+
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+      if (!lib$es6$promise$utils$$isArray(entries)) {
+        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
+        return promise;
+      }
+
+      var length = entries.length;
+
+      function onFulfillment(value) {
+        lib$es6$promise$$internal$$resolve(promise, value);
+      }
+
+      function onRejection(reason) {
+        lib$es6$promise$$internal$$reject(promise, reason);
+      }
+
+      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
+      }
+
+      return promise;
+    }
+    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
+    function lib$es6$promise$promise$reject$$reject(reason) {
+      /*jshint validthis:true */
+      var Constructor = this;
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$reject(promise, reason);
+      return promise;
+    }
+    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
+
+    var lib$es6$promise$promise$$counter = 0;
+
+    function lib$es6$promise$promise$$needsResolver() {
+      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+    }
+
+    function lib$es6$promise$promise$$needsNew() {
+      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+    }
+
+    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
+    /**
+      Promise objects represent the eventual result of an asynchronous operation. The
+      primary way of interacting with a promise is through its `then` method, which
+      registers callbacks to receive either a promise's eventual value or the reason
+      why the promise cannot be fulfilled.
+
+      Terminology
+      -----------
+
+      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+      - `thenable` is an object or function that defines a `then` method.
+      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+      - `exception` is a value that is thrown using the throw statement.
+      - `reason` is a value that indicates why a promise was rejected.
+      - `settled` the final resting state of a promise, fulfilled or rejected.
+
+      A promise can be in one of three states: pending, fulfilled, or rejected.
+
+      Promises that are fulfilled have a fulfillment value and are in the fulfilled
+      state.  Promises that are rejected have a rejection reason and are in the
+      rejected state.  A fulfillment value is never a thenable.
+
+      Promises can also be said to *resolve* a value.  If this value is also a
+      promise, then the original promise's settled state will match the value's
+      settled state.  So a promise that *resolves* a promise that rejects will
+      itself reject, and a promise that *resolves* a promise that fulfills will
+      itself fulfill.
+
+
+      Basic Usage:
+      ------------
+
+      ```js
+      var promise = new Promise(function(resolve, reject) {
+        // on success
+        resolve(value);
+
+        // on failure
+        reject(reason);
+      });
+
+      promise.then(function(value) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+
+      Advanced Usage:
+      ---------------
+
+      Promises shine when abstracting away asynchronous interactions such as
+      `XMLHttpRequest`s.
+
+      ```js
+      function getJSON(url) {
+        return new Promise(function(resolve, reject){
+          var xhr = new XMLHttpRequest();
+
+          xhr.open('GET', url);
+          xhr.onreadystatechange = handler;
+          xhr.responseType = 'json';
+          xhr.setRequestHeader('Accept', 'application/json');
+          xhr.send();
+
+          function handler() {
+            if (this.readyState === this.DONE) {
+              if (this.status === 200) {
+                resolve(this.response);
+              } else {
+                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+              }
+            }
+          };
+        });
+      }
+
+      getJSON('/posts.json').then(function(json) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+
+      Unlike callbacks, promises are great composable primitives.
+
+      ```js
+      Promise.all([
+        getJSON('/posts'),
+        getJSON('/comments')
+      ]).then(function(values){
+        values[0] // => postsJSON
+        values[1] // => commentsJSON
+
+        return values;
+      });
+      ```
+
+      @class Promise
+      @param {function} resolver
+      Useful for tooling.
+      @constructor
+    */
+    function lib$es6$promise$promise$$Promise(resolver) {
+      this._id = lib$es6$promise$promise$$counter++;
+      this._state = undefined;
+      this._result = undefined;
+      this._subscribers = [];
+
+      if (lib$es6$promise$$internal$$noop !== resolver) {
+        typeof resolver !== 'function' && lib$es6$promise$promise$$needsResolver();
+        this instanceof lib$es6$promise$promise$$Promise ? lib$es6$promise$$internal$$initializePromise(this, resolver) : lib$es6$promise$promise$$needsNew();
+      }
+    }
+
+    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
+    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
+    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
+    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
+    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
+    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
+    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
+
+    lib$es6$promise$promise$$Promise.prototype = {
+      constructor: lib$es6$promise$promise$$Promise,
+
+    /**
+      The primary way of interacting with a promise is through its `then` method,
+      which registers callbacks to receive either a promise's eventual value or the
+      reason why the promise cannot be fulfilled.
+
+      ```js
+      findUser().then(function(user){
+        // user is available
+      }, function(reason){
+        // user is unavailable, and you are given the reason why
+      });
+      ```
+
+      Chaining
+      --------
+
+      The return value of `then` is itself a promise.  This second, 'downstream'
+      promise is resolved with the return value of the first promise's fulfillment
+      or rejection handler, or rejected if the handler throws an exception.
+
+      ```js
+      findUser().then(function (user) {
+        return user.name;
+      }, function (reason) {
+        return 'default name';
+      }).then(function (userName) {
+        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+        // will be `'default name'`
+      });
+
+      findUser().then(function (user) {
+        throw new Error('Found user, but still unhappy');
+      }, function (reason) {
+        throw new Error('`findUser` rejected and we're unhappy');
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+      });
+      ```
+      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+
+      ```js
+      findUser().then(function (user) {
+        throw new PedagogicalException('Upstream error');
+      }).then(function (value) {
+        // never reached
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // The `PedgagocialException` is propagated all the way down to here
+      });
+      ```
+
+      Assimilation
+      ------------
+
+      Sometimes the value you want to propagate to a downstream promise can only be
+      retrieved asynchronously. This can be achieved by returning a promise in the
+      fulfillment or rejection handler. The downstream promise will then be pending
+      until the returned promise is settled. This is called *assimilation*.
+
+      ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // The user's comments are now available
+      });
+      ```
+
+      If the assimliated promise rejects, then the downstream promise will also reject.
+
+      ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // If `findCommentsByAuthor` fulfills, we'll have the value here
+      }, function (reason) {
+        // If `findCommentsByAuthor` rejects, we'll have the reason here
+      });
+      ```
+
+      Simple Example
+      --------------
+
+      Synchronous Example
+
+      ```javascript
+      var result;
+
+      try {
+        result = findResult();
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+
+      Errback Example
+
+      ```js
+      findResult(function(result, err){
+        if (err) {
+          // failure
+        } else {
+          // success
+        }
+      });
+      ```
+
+      Promise Example;
+
+      ```javascript
+      findResult().then(function(result){
+        // success
+      }, function(reason){
+        // failure
+      });
+      ```
+
+      Advanced Example
+      --------------
+
+      Synchronous Example
+
+      ```javascript
+      var author, books;
+
+      try {
+        author = findAuthor();
+        books  = findBooksByAuthor(author);
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+
+      Errback Example
+
+      ```js
+
+      function foundBooks(books) {
+
+      }
+
+      function failure(reason) {
+
+      }
+
+      findAuthor(function(author, err){
+        if (err) {
+          failure(err);
+          // failure
+        } else {
+          try {
+            findBoooksByAuthor(author, function(books, err) {
+              if (err) {
+                failure(err);
+              } else {
+                try {
+                  foundBooks(books);
+                } catch(reason) {
+                  failure(reason);
+                }
+              }
+            });
+          } catch(error) {
+            failure(err);
+          }
+          // success
+        }
+      });
+      ```
+
+      Promise Example;
+
+      ```javascript
+      findAuthor().
+        then(findBooksByAuthor).
+        then(function(books){
+          // found books
+      }).catch(function(reason){
+        // something went wrong
+      });
+      ```
+
+      @method then
+      @param {Function} onFulfilled
+      @param {Function} onRejected
+      Useful for tooling.
+      @return {Promise}
+    */
+      then: lib$es6$promise$then$$default,
+
+    /**
+      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+      as the catch block of a try/catch statement.
+
+      ```js
+      function findAuthor(){
+        throw new Error('couldn't find that author');
+      }
+
+      // synchronous
+      try {
+        findAuthor();
+      } catch(reason) {
+        // something went wrong
+      }
+
+      // async with promises
+      findAuthor().catch(function(reason){
+        // something went wrong
+      });
+      ```
+
+      @method catch
+      @param {Function} onRejection
+      Useful for tooling.
+      @return {Promise}
+    */
+      'catch': function(onRejection) {
+        return this.then(null, onRejection);
+      }
     };
-    "function" === typeof define && define.amd ? define(function () {
-        return z
-    }) : "undefined" !== typeof module && module.exports ? module.exports = z : "undefined" !== typeof this && (this.ES6Promise = z)
+    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
+    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
+      this._instanceConstructor = Constructor;
+      this.promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+      if (Array.isArray(input)) {
+        this._input     = input;
+        this.length     = input.length;
+        this._remaining = input.length;
+
+        this._result = new Array(this.length);
+
+        if (this.length === 0) {
+          lib$es6$promise$$internal$$fulfill(this.promise, this._result);
+        } else {
+          this.length = this.length || 0;
+          this._enumerate();
+          if (this._remaining === 0) {
+            lib$es6$promise$$internal$$fulfill(this.promise, this._result);
+          }
+        }
+      } else {
+        lib$es6$promise$$internal$$reject(this.promise, this._validationError());
+      }
+    }
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
+      return new Error('Array Methods must be provided an Array');
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
+      var length  = this.length;
+      var input   = this._input;
+
+      for (var i = 0; this._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        this._eachEntry(input[i], i);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
+      var c = this._instanceConstructor;
+      var resolve = c.resolve;
+
+      if (resolve === lib$es6$promise$promise$resolve$$default) {
+        var then = lib$es6$promise$$internal$$getThen(entry);
+
+        if (then === lib$es6$promise$then$$default &&
+            entry._state !== lib$es6$promise$$internal$$PENDING) {
+          this._settledAt(entry._state, i, entry._result);
+        } else if (typeof then !== 'function') {
+          this._remaining--;
+          this._result[i] = entry;
+        } else if (c === lib$es6$promise$promise$$default) {
+          var promise = new c(lib$es6$promise$$internal$$noop);
+          lib$es6$promise$$internal$$handleMaybeThenable(promise, entry, then);
+          this._willSettleAt(promise, i);
+        } else {
+          this._willSettleAt(new c(function(resolve) { resolve(entry); }), i);
+        }
+      } else {
+        this._willSettleAt(resolve(entry), i);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
+      var promise = this.promise;
+
+      if (promise._state === lib$es6$promise$$internal$$PENDING) {
+        this._remaining--;
+
+        if (state === lib$es6$promise$$internal$$REJECTED) {
+          lib$es6$promise$$internal$$reject(promise, value);
+        } else {
+          this._result[i] = value;
+        }
+      }
+
+      if (this._remaining === 0) {
+        lib$es6$promise$$internal$$fulfill(promise, this._result);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+      var enumerator = this;
+
+      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
+        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
+      }, function(reason) {
+        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
+      });
+    };
+    function lib$es6$promise$polyfill$$polyfill() {
+      var local;
+
+      if (typeof global !== 'undefined') {
+          local = global;
+      } else if (typeof self !== 'undefined') {
+          local = self;
+      } else {
+          try {
+              local = Function('return this')();
+          } catch (e) {
+              throw new Error('polyfill failed because global object is unavailable in this environment');
+          }
+      }
+
+      var P = local.Promise;
+
+      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+        return;
+      }
+
+      local.Promise = lib$es6$promise$promise$$default;
+    }
+    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
+
+    var lib$es6$promise$umd$$ES6Promise = {
+      'Promise': lib$es6$promise$promise$$default,
+      'polyfill': lib$es6$promise$polyfill$$default
+    };
+
+    /* global define:true module:true window: true */
+    if (typeof define === 'function' && define['amd']) {
+      define(function() { return lib$es6$promise$umd$$ES6Promise; });
+    } else if (typeof module !== 'undefined' && module['exports']) {
+      module['exports'] = lib$es6$promise$umd$$ES6Promise;
+    } else if (typeof this !== 'undefined') {
+      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
+    }
+
+    lib$es6$promise$polyfill$$default();
 }).call(this);
+
+
 
 (function() {
 	var global = {};
@@ -494,6 +1174,10 @@ ConfigParser.prototype = {
      * @return {array|string} The mapped module or array of mapped modules.
      */
     mapModule: function(module) {
+        if (!this._config.maps) {
+            return module;
+        }
+
         var modules;
 
         if (Array.isArray(module)) {
@@ -505,6 +1189,8 @@ ConfigParser.prototype = {
         for (var i = 0; i < modules.length; i++) {
             var tmpModule = modules[i];
 
+            var found = false;
+
             for (var alias in this._config.maps) {
                 /* istanbul ignore else */
                 if (Object.prototype.hasOwnProperty.call(this._config.maps, alias)) {
@@ -512,9 +1198,15 @@ ConfigParser.prototype = {
                         tmpModule = this._config.maps[alias] + tmpModule.substring(alias.length);
                         modules[i] = tmpModule;
 
+                        found = true;
                         break;
                     }
                 }
+            }
+
+            /* istanbul ignore else */
+            if(!found && typeof this._config.maps['*'] === 'function') {
+                modules[i] = this._config.maps['*'](tmpModule);
             }
         }
 
@@ -842,13 +1534,13 @@ DependencyBuilder.prototype = {
 // "http", "https", "//" and "www."
 var REGEX_EXTERNAL_PROTOCOLS = /^https?:\/\/|\/\/|www\./;
 
+
 /**
  * Creates an instance of URLBuilder class.
  *
  * @constructor
  * @param {object} - instance of {@link ConfigParser} object.
  */
-
 function URLBuilder(configParser) {
     this._configParser = configParser;
 }
@@ -865,6 +1557,8 @@ URLBuilder.prototype = {
     build: function (modules) {
         var bufferAbsoluteURL = [];
         var bufferRelativeURL = [];
+        var modulesAbsoluteURL = [];
+        var modulesRelativeURL = [];
         var result = [];
 
         var config = this._configParser.getConfig();
@@ -882,7 +1576,10 @@ URLBuilder.prototype = {
 
             // If module has fullPath, individual URL have to be created.
             if (module.fullPath) {
-                result.push(module.fullPath);
+                result.push({
+                    modules: [module.name],
+                    url: module.fullPath
+                });
 
             } else {
                 var path = this._getModulePath(module);
@@ -890,21 +1587,30 @@ URLBuilder.prototype = {
 
                 // If the URL starts with external protocol, individual URL shall be created.
                 if (REGEX_EXTERNAL_PROTOCOLS.test(path)) {
-                    result.push(path);
+                    result.push({
+                        modules: [module.name],
+                        url: path
+                    });
 
-                // If combine is disabled, create individual URL based on config URL and module path.
-                // If the module path starts with "/", do not include basePath in the URL.
-                } else if (!config.combine) {
-                    result.push(config.url + (absolutePath ? '' : basePath) + path);
+                // If combine is disabled, or the module is an anonymous one,
+                // create an individual URL based on the config URL and module's path.
+                // If the module's path starts with "/", do not include basePath in the URL.
+                } else if (!config.combine || module.anonymous) {
+                    result.push({
+                        modules: [module.name],
+                        url: config.url + (absolutePath ? '' : basePath) + path
+                    });
 
                 } else {
-                    // If combine is true and module does not have full path, it will be collected
-                    // in a buffer to be loaded among with other modules from combo loader.
-                    // We will put the path in different buffer depending on the fact if it is absolute URL or not.
+                    // If combine is true, this is not an anonymous module and the module does not have full path.
+                    // The module will be collected in a buffer to be loaded among with other modules from combo loader.
+                    // The path will be stored in different buffer depending on the fact if it is absolute URL or not.
                     if (absolutePath) {
                         bufferAbsoluteURL.push(path);
+                        modulesAbsoluteURL.push(module.name);
                     } else {
                         bufferRelativeURL.push(path);
+                        modulesRelativeURL.push(module.name);
                     }
                 }
             }
@@ -914,15 +1620,75 @@ URLBuilder.prototype = {
 
         // Add to the result all modules, which have to be combined.
         if (bufferRelativeURL.length) {
-            result.push(config.url + basePath + bufferRelativeURL.join('&' + basePath));
+            result = result.concat(
+                this._generateBufferURLs(
+                    modulesRelativeURL,
+                    bufferRelativeURL,
+                    {
+                        basePath: basePath,
+                        url: config.url,
+                        urlMaxLength: config.urlMaxLength
+                    }
+                )
+            );
             bufferRelativeURL.length = 0;
-
         }
 
         if (bufferAbsoluteURL.length) {
-            result.push(config.url + bufferAbsoluteURL.join('&'));
+            result = result.concat(
+                this._generateBufferURLs(
+                    modulesAbsoluteURL,
+                    bufferAbsoluteURL,
+                    {
+                        url: config.url,
+                        urlMaxLength: config.urlMaxLength
+                    }
+                )
+            );
             bufferAbsoluteURL.length = 0;
         }
+
+        return result;
+    },
+
+    /**
+     * Generate the appropriate set of URLs based on the list of
+     * required modules and the maximum allowed URL length
+     *
+     * @param {Array<String>} modules Array of module names
+     * @param {Array<String>} urls Array of module URLs
+     * @param {Object} config Configuration object containing URL, basePath and urlMaxLength
+     * @return {Array<Object>} Resulting array of {modules, url} objects
+     */
+    _generateBufferURLs: function(modules, urls, config) {
+        var i;
+        var basePath = config.basePath || '';
+        var result = [];
+        var urlMaxLength = config.urlMaxLength || 2000;
+
+        var urlResult = {
+            modules: [modules[0]],
+            url: config.url + basePath + urls[0]
+        };
+
+        for (i = 1; i < urls.length; i++) {
+            var module = modules[i];
+            var path = urls[i];
+
+            if ((urlResult.url.length + basePath.length + path.length + 1) < urlMaxLength) {
+                urlResult.modules.push(module);
+                urlResult.url += '&' + basePath + path;
+            } else {
+                result.push(urlResult);
+
+                urlResult = {
+                    modules: [module],
+                    url: config.url + basePath + path
+                };
+            }
+        }
+
+        result.push(urlResult);
 
         return result;
     },
@@ -938,15 +1704,19 @@ URLBuilder.prototype = {
     _getModulePath: function (module) {
         var path = module.path || module.name;
 
-        var paths = this._configParser.getConfig().paths;
+        var paths = this._configParser.getConfig().paths || {};
 
-        for (var key in paths) {
+        var found = false;
+        Object.keys(paths).forEach(function(item) {
             /* istanbul ignore else */
-            if (Object.prototype.hasOwnProperty.call(paths, key)) {
-                if (path === key || path.indexOf(key + '/') === 0) {
-                    path = paths[key] + path.substring(key.length);
-                }
+            if (path === item || path.indexOf(item + '/') === 0) {
+                path = paths[item] + path.substring(item.length);
             }
+        });
+
+        /* istanbul ignore else */
+        if(!found && typeof paths['*'] === 'function') {
+            path = paths['*'](path);
         }
 
         if (!REGEX_EXTERNAL_PROTOCOLS.test(path) && path.indexOf('.js') !== path.length - 3) {
@@ -1122,55 +1892,58 @@ var LoaderProtoMethods = {
      *              global namespace. In this way you can load legacy modules.
      *          </li>
      *     </ul>
-     * @return {Object} The constructed module.
      */
     define: function(name, dependencies, implementation, config) {
+        var self = this;
+
         void 0;
+
+        config = config || {};
 
         var passedArgsCount = arguments.length;
 
+        config.anonymous = false;
+
         if (passedArgsCount < 2) {
             void 0;
-            // we don't support modules with implementation only
-            return;
+            implementation = arguments[0];
+            dependencies = ['module', 'exports'];
+            config.anonymous = true;
         } else if (passedArgsCount === 2) {
             if (typeof name === 'string') {
                 void 0;
                 // there are two parameters, but the first one is not an array with dependencies,
                 // this is a module name
-                implementation = dependencies;
                 dependencies = ['module', 'exports'];
+                implementation = arguments[1];
             } else {
-                // anonymous module, we don't support this
-                return;
+                void 0;
+                dependencies = arguments[0];
+                implementation = arguments[1];
+                config.anonymous = true;
             }
         }
 
-        // Create a new module by merging the provided config with the passed name,
-        // dependencies and implementation.
-        var module = config || {};
-        var configParser = this._getConfigParser();
+        if (config.anonymous) {
+            // Postpone module's registration till the next scriptLoaded event
+            var onScriptLoaded = function(loadedModules) {
+                self.off('scriptLoaded', onScriptLoaded);
 
-        var pathResolver = this._getPathResolver();
+                if (loadedModules.length !== 1) {
+                    throw new Error('Multiple anonymous modules cannot be served via combo service. ' +
+                        'Please set `combine` to `false` or describe the modules in the config ' +
+                        'and mark them as anonymous.', loadedModules);
+                } else {
+                    var moduleName = loadedModules[0];
+                    self._define(moduleName, dependencies, implementation, config);
+                }
+            };
 
-        // Resolve the path according to the parent module. Example:
-        // define('metal/src/component/component', ['../array/array']) will become:
-        // define('metal/src/component/component', ['metal/src/array/array'])
-        dependencies = dependencies.map(function(dependency) {
-            return pathResolver.resolvePath(name, dependency);
-        });
-
-        module.name = name;
-        module.dependencies = dependencies;
-        module.pendingImplementation = implementation;
-
-        configParser.addModule(module);
-
-        if (!this._modulesMap[module.name]) {
-            this._modulesMap[module.name] = true;
+            self.on('scriptLoaded', onScriptLoaded);
+        } else {
+            // This is not an anonymous module, go directly to module's registration flow
+            this._define(name, dependencies, implementation, config);
         }
-
-        this.emit('moduleRegister', name);
     },
 
     /**
@@ -1324,7 +2097,21 @@ var LoaderProtoMethods = {
                 if (!!exportedValue) {
                     resolve(exportedValue);
                 } else {
-                    reject(new Error('Module ' + moduleName + ' does not export the specified value: ' + module.exports));
+                    var onScriptLoaded = function(loadedModules) {
+                        if (loadedModules.indexOf(moduleName) >= 0) {
+                            self.off('scriptLoaded', onScriptLoaded);
+
+                            var exportedValue = self._getValueGlobalNS(module.exports);
+
+                            if (!!exportedValue) {
+                                resolve(exportedValue);
+                            } else {
+                                reject(new Error('Module ' + moduleName + ' does not export the specified value: ' + module.exports));
+                            }
+                        }
+                    };
+
+                    self.on('scriptLoaded', onScriptLoaded);
                 }
             } else {
                 var onModuleRegister = function(registeredModuleName) {
@@ -1342,6 +2129,45 @@ var LoaderProtoMethods = {
                 self.on('moduleRegister', onModuleRegister);
             }
         });
+    },
+
+    /**
+     * Defines a module in the system and fires {@link Loader#event:moduleRegister} event with the registered module as param.
+     * Called internally by {@link Loader#define} method once it normalizes the passed arguments.
+     *
+     * @memberof! Loader#
+     * @protected
+     * @param {string} name The name of the module.
+     * @param {array} dependencies List of module dependencies.
+     * @param {function} implementation The implementation of the module.
+     * @param {object=} config See {@link Loader:define} for more details.
+     */
+    _define: function(name, dependencies, implementation, config) {
+        // Create a new module by merging the provided config with the passed name,
+        // dependencies and implementation.
+        var module = config || {};
+        var configParser = this._getConfigParser();
+
+        var pathResolver = this._getPathResolver();
+
+        // Resolve the path according to the parent module. Example:
+        // define('metal/src/component/component', ['../array/array']) will become:
+        // define('metal/src/component/component', ['metal/src/array/array'])
+        dependencies = dependencies.map(function(dependency) {
+            return pathResolver.resolvePath(name, dependency);
+        });
+
+        module.name = name;
+        module.dependencies = dependencies;
+        module.pendingImplementation = implementation;
+
+        configParser.addModule(module);
+
+        if (!this._modulesMap[module.name]) {
+            this._modulesMap[module.name] = true;
+        }
+
+        this.emit('moduleRegister', name);
     },
 
     /**
@@ -1473,25 +2299,49 @@ var LoaderProtoMethods = {
     },
 
     /**
-     * Filters a list of modules and returns only these which have been not yet requested for delivery via network.
+     * Filters a list of modules and returns only these which don't have any of the provided list
+     * of properties.
      *
      * @memberof! Loader#
      * @protected
-     * @param {array} modules List of modules which which will be filtered.
-     * @return {array} List of modules not yet requested for delivery via network.
+     * @param {array} modules List of modules which which have to be filtered.
+     * @return {array} List of modules matching the specified filter.
      */
-    _filterNotRequestedModules: function(modules) {
+    _filterModulesByProperty: function(moduleNames, property) {
+        var properties = property;
+
+        if (typeof property === 'string') {
+            properties = [property];
+        }
+
         var missingModules = [];
 
         var registeredModules = this._getConfigParser().getModules();
 
-        for (var i = 0; i < modules.length; i++) {
-            var registeredModule = registeredModules[modules[i]];
+        for (var i = 0; i < moduleNames.length; i++) {
+            var moduleName = moduleNames[i];
 
-            // Get all modules which are not yet requested from the server.
+            var registeredModule = registeredModules[moduleNames[i]];
+
+            if (!registeredModule) {
+                missingModules.push(moduleName);
+                continue;
+            }
+
             // We exclude "exports" and "module" modules, which are part of AMD spec.
-            if ((registeredModule !== 'exports' && registeredModule !== 'module') && (!registeredModule || !registeredModule.requested)) {
-                missingModules.push(modules[i]);
+            if (registeredModule === 'exports' || registeredModule === 'module') {
+                continue;
+            }
+
+            for (var found = 0, j = 0; j < properties.length; j++) {
+                if (registeredModule[properties[j]]) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                missingModules.push(moduleName);
             }
         }
 
@@ -1510,18 +2360,18 @@ var LoaderProtoMethods = {
         var self = this;
 
         return new Promise(function(resolve, reject) {
-            // First, detect any not yet requested modules
-            var notRequestedModules = self._filterNotRequestedModules(moduleNames);
+            // Get all modules without pending implementation or not yet requested
+            var modulesForLoading = self._filterModulesByProperty(moduleNames, ['requested', 'pendingImplementation']);
 
-            if (notRequestedModules.length) {
-                // If there are not yet requested modules, construct their URLs
-                var urls = self._getURLBuilder().build(notRequestedModules);
+            if (modulesForLoading.length) {
+                // If there are modules, which have to be loaded, construct their URLs
+                var modulesURL = self._getURLBuilder().build(modulesForLoading);
 
                 var pendingScripts = [];
 
                 // Create promises for each of the scripts, which should be loaded
-                for (var i = 0; i < urls.length; i++) {
-                    pendingScripts.push(self._loadScript(urls[i]));
+                for (var i = 0; i < modulesURL.length; i++) {
+                    pendingScripts.push(self._loadScript(modulesURL[i]));
                 }
 
                 // Wait for resolving all script Promises
@@ -1529,29 +2379,29 @@ var LoaderProtoMethods = {
 
                 void 0;
                 Promise.all(pendingScripts).then(function(loadedScripts) {
-                    return self._waitForModules(moduleNames);
-                })
-                // As soon as all scripts were loaded and all dependencies have been resolved,
-                // resolve the main Promise
-                .then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If any script fails to load or other error happens,
-                // reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
+                        return self._waitForModules(moduleNames);
+                    })
+                    // As soon as all scripts were loaded and all dependencies have been resolved,
+                    // resolve the main Promise
+                    .then(function(loadedModules) {
+                        resolve(loadedModules);
+                    })
+                    // If any script fails to load or other error happens,
+                    // reject the main Promise
+                    .catch(function(error) {
+                        reject(error);
+                    });
             } else {
                 // If there are no any missing modules, just wait for modules dependencies
                 // to be resolved and then resolve the main promise
                 self._waitForModules(moduleNames).then(function(loadedModules) {
-                    resolve(loadedModules);
-                })
-                // If some error happens, for example if some module implementation
-                // throws error, reject the main Promise
-                .catch(function(error) {
-                    reject(error);
-                });
+                        resolve(loadedModules);
+                    })
+                    // If some error happens, for example if some module implementation
+                    // throws error, reject the main Promise
+                    .catch(function(error) {
+                        reject(error);
+                    });
             }
         });
     },
@@ -1561,14 +2411,18 @@ var LoaderProtoMethods = {
      *
      * @memberof! Loader#
      * @protected
-     * @param {string} url The src of the script.
+     * @param {object} modulesURL An Object with two properties:
+     * - modules - List of the modules which should be loaded
+     * - url - The URL from which the modules should be loaded
      * @return {Promise} Promise which will be resolved as soon as the script is being loaded.
      */
-    _loadScript: function(url) {
+    _loadScript: function(modulesURL) {
+        var self = this;
+
         return new Promise(function(resolve, reject) {
             var script = document.createElement('script');
 
-            script.src = url;
+            script.src = modulesURL.url;
 
             // On ready state change is needed for IE < 9, not sure if that is needed anymore,
             // it depends which browsers will we support at the end
@@ -1578,17 +2432,19 @@ var LoaderProtoMethods = {
                     script.onload = script.onreadystatechange = null;
 
                     resolve(script);
+
+                    self.emit('scriptLoaded', modulesURL.modules);
                 }
             };
 
             // If some script fails to load, reject the main Promise
             script.onerror = function() {
-                document.body.removeChild(script);
+                document.head.removeChild(script);
 
                 reject(script);
             };
 
-            document.body.appendChild(script);
+            document.head.appendChild(script);
         });
     },
 
@@ -1651,7 +2507,7 @@ var LoaderProtoMethods = {
 
                     dependencyImplementations.push(exportsImpl);
                 } else if (dependency === 'module') {
-                    exportsImpl = {exports: {}};
+                    exportsImpl = { exports: {} };
 
                     dependencyImplementations.push(exportsImpl);
                 } else {
@@ -1738,7 +2594,7 @@ var LoaderProtoMethods = {
                 // get the implementation from the module.
                 var registeredModules = self._getConfigParser().getModules();
 
-                var defineModules = function () {
+                var defineModules = function() {
                     var definedModules = [];
 
                     for (var i = 0; i < moduleNames.length; i++) {
@@ -1773,6 +2629,7 @@ var LoaderProtoMethods = {
 Object.keys(LoaderProtoMethods).forEach(function(key) {
     Loader.prototype[key] = LoaderProtoMethods[key];
 });
+
 
     return Loader;
 }));

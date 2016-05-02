@@ -66,7 +66,7 @@ gulp.task('create-loader', ['create-loader-debug'], function() {
 gulp.task('create-loader-debug', ['create-loader-pure-debug'], function() {
     return gulp.src('src/template/loader.template')
         .pipe(template({
-            vendor: fs.readFileSync('src/vendor/promise.js').toString(),
+            vendor: fs.readFileSync('node_modules/es6-promise/dist/es6-promise.js').toString(),
             source: fs.readFileSync('dist/loader-pure-debug.js').toString()
         }))
         .pipe(rename('loader-debug.js'))
@@ -131,7 +131,12 @@ gulp.task('modules2', function() {
         .pipe(gulp.dest('dist/demo/modules2'));
 });
 
-gulp.task('modules', ['copy-bower', 'modules2'], function() {
+gulp.task('modules3', function() {
+    return gulp.src('src/modules3/**/*.js')
+        .pipe(gulp.dest('dist/demo/modules3'));
+});
+
+gulp.task('modules', ['copy-bower', 'modules2', 'modules3'], function() {
     return gulp.src('src/modules/**/*.js')
         .pipe(babel({
             plugins: ['transform-es2015-modules-amd']

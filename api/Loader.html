@@ -223,7 +223,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line245">line 245</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line248">line 248</a>
     </li></ul></dd>
     
 
@@ -275,7 +275,7 @@
         
             
 <dt>
-    <h4 class="name" id="_filterNotRequestedModules"><span class="type-signature">&lt;protected> </span>_filterNotRequestedModules<span class="signature">(modules)</span><span class="type-signature"> &rarr; {array}</span></h4>
+    <h4 class="name" id="_define"><span class="type-signature">&lt;protected> </span>_define<span class="signature">(name, dependencies, implementation, <span class="optional">config</span>)</span><span class="type-signature"></span></h4>
 
     
 </dt>
@@ -283,7 +283,233 @@
 
     
     <div class="description">
-        Filters a list of modules and returns only these which have been not yet requested for delivery via network.
+        Defines a module in the system and fires <a href="Loader.html#event:moduleRegister">Loader#event:moduleRegister</a> event with the registered module as param.
+Called internally by <a href="Loader.html#define">Loader#define</a> method once it normalizes the passed arguments.
+    </div>
+    
+
+    
+
+    
+
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the module.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dependencies</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">List of module dependencies.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>implementation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The implementation of the module.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">See Loader:define for more details.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+    
+
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line309">line 309</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="_filterModulesByProperty"><span class="type-signature">&lt;protected> </span>_filterModulesByProperty<span class="signature">(modules)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Filters a list of modules and returns only these which don't have any of the provided list
+of properties.
     </div>
     
 
@@ -333,7 +559,7 @@
 
             
 
-            <td class="description last">List of modules which which will be filtered.</td>
+            <td class="description last">List of modules which which have to be filtered.</td>
         </tr>
 
     
@@ -364,7 +590,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line417">line 417</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line474">line 474</a>
     </li></ul></dd>
     
 
@@ -391,7 +617,7 @@
     
             
 <div class="param-desc">
-    List of modules not yet requested for delivery via network.
+    List of modules matching the specified filter.
 </div>
 
 
@@ -457,7 +683,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line288">line 288</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line344">line 344</a>
     </li></ul></dd>
     
 
@@ -550,7 +776,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line303">line 303</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line359">line 359</a>
     </li></ul></dd>
     
 
@@ -692,7 +918,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line332">line 332</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -833,7 +1059,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line365">line 365</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line421">line 421</a>
     </li></ul></dd>
     
 
@@ -926,7 +1152,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line386">line 386</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line442">line 442</a>
     </li></ul></dd>
     
 
@@ -1019,7 +1245,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line401">line 401</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line457">line 457</a>
     </li></ul></dd>
     
 
@@ -1160,7 +1386,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line319">line 319</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line375">line 375</a>
     </li></ul></dd>
     
 
@@ -1301,7 +1527,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line443">line 443</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line523">line 523</a>
     </li></ul></dd>
     
 
@@ -1353,7 +1579,7 @@ A missing dependency is a dependency, which does not have pending implementation
         
             
 <dt>
-    <h4 class="name" id="_loadScript"><span class="type-signature">&lt;protected> </span>_loadScript<span class="signature">(url)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="_loadScript"><span class="type-signature">&lt;protected> </span>_loadScript<span class="signature">(modulesURL)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 </dt>
@@ -1395,13 +1621,13 @@ A missing dependency is a dependency, which does not have pending implementation
 
         <tr>
             
-                <td class="name"><code>url</code></td>
+                <td class="name"><code>modulesURL</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">object</span>
 
 
             
@@ -1411,7 +1637,9 @@ A missing dependency is a dependency, which does not have pending implementation
 
             
 
-            <td class="description last">The src of the script.</td>
+            <td class="description last">An Object with two properties:
+- modules - List of the modules which should be loaded
+- url - The URL from which the modules should be loaded</td>
         </tr>
 
     
@@ -1442,7 +1670,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line501">line 501</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line583">line 583</a>
     </li></ul></dd>
     
 
@@ -1583,7 +1811,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line537">line 537</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line623">line 623</a>
     </li></ul></dd>
     
 
@@ -1724,7 +1952,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line558">line 558</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line644">line 644</a>
     </li></ul></dd>
     
 
@@ -1843,7 +2071,7 @@ A missing dependency is a dependency, which does not have pending implementation
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line632">line 632</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line718">line 718</a>
     </li></ul></dd>
     
 
@@ -1981,7 +2209,7 @@ implementations.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line657">line 657</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line743">line 743</a>
     </li></ul></dd>
     
 
@@ -2170,7 +2398,7 @@ implementations.
         
             
 <dt>
-    <h4 class="name" id="define"><span class="type-signature"></span>define<span class="signature">(name, dependencies, implementation, <span class="optional">config</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="define"><span class="type-signature"></span>define<span class="signature">(name, dependencies, implementation, <span class="optional">config</span>)</span><span class="type-signature"></span></h4>
 
     
 </dt>
@@ -2380,7 +2608,7 @@ implementations.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line61">line 61</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -2403,28 +2631,6 @@ implementations.
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The constructed module.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-        
 
     
 </dd>
@@ -2621,7 +2827,7 @@ param will be passed to each listener of the event.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line116">line 116</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line119">line 119</a>
     </li></ul></dd>
     
 
@@ -2714,7 +2920,7 @@ param will be passed to each listener of the event.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line126">line 126</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -3202,7 +3408,7 @@ in the provided success callback will be left undefined.<br>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line142">line 142</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -3329,7 +3535,7 @@ in the provided success callback will be left undefined.<br>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line699">line 699</a>
+        <a href="script-loader.js.html">script-loader.js</a>, <a href="script-loader.js.html#line785">line 785</a>
     </li></ul></dd>
     
 
@@ -3374,7 +3580,7 @@ in the provided success callback will be left undefined.<br>
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Sun Dec 20 2015 09:36:44 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Fri Apr 29 2016 22:02:55 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
